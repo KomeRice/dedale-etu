@@ -15,7 +15,7 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
-import eu.su.mas.dedaleEtu.mas.behaviours.ShareMapBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.SendMessageBehaviour;
 
 
 import jade.core.AID;
@@ -123,15 +123,13 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}else {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
 				}
-				//if(detectevoisin) {
-				//	this.myAgent.addBehaviour(new ShareMapBehaviour(this.myAgent,500,this.myMap,list_agentNames));
-				//}
-				
-				//if(a recu message) {
-				//	this.myAgent.addBehaviour(new ReadMessageBehaviour(this.myAgent,500,this.myMap));
-				//}
-				
+				this.myAgent.addBehaviour(new SendPingBehaviour(this.myAgent,this.list_agentNames));
 
+				// recu un message, le pauser et lancer l'ecoute
+				if (this.myAgent.getReceivedMessagesCnt() > 0) { 
+					this.myAgent.addBehaviour(new ReadMessageBehaviour(this.myAgent,this.myMap));
+					block();
+				}
 				((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
 			}
 
