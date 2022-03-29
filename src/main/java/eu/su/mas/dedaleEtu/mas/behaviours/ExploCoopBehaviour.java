@@ -123,7 +123,6 @@ public class ExploCoopBehaviour extends SimpleBehaviour {
 				}else {
 					//System.out.println("nextNode notNUll - "+this.myAgent.getLocalName()+"-- list= "+this.myMap.getOpenNodes()+"\n -- nextNode: "+nextNode);
 				}
-				this.myAgent.addBehaviour(new SendPingBehaviour(this.myAgent,this.list_agentNames));
 
 				// recu un message, le pauser et lancer l'ecoute
 				if (this.myAgent.getReceivedMessagesCnt() > 0) { 
