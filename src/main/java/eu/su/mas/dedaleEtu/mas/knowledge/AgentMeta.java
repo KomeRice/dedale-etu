@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AgentMeta implements Serializable{
+public class AgentMeta implements Serializable {
     private List<String> list_agentNames;
     private MapRepresentation myMap;
     private List<String> openNodes;
@@ -42,9 +42,4 @@ public class AgentMeta implements Serializable{
     public MapRepresentation getMyMap() {
         return myMap;
     }
-
-
-
-
-
 }

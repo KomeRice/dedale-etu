@@ -6,11 +6,13 @@ import java.util.List;
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
+import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -25,10 +27,11 @@ import jade.lang.acl.UnreadableException;
  * @author hc
  *
  */
-public class ShareMapBehaviour extends SimpleBehaviour{
+public class ShareMapBehaviour extends OneShotBehaviour {
 	
 	private MapRepresentation myMap;
 	private List<String> receivers;
+	private AgentMeta info;
 	/**
 	 * The agent periodically share its map.
 	 * It blindly tries to send all its graph to its friend(s)  	
@@ -39,10 +42,11 @@ public class ShareMapBehaviour extends SimpleBehaviour{
 	 * @param mymap (the map to share)
 	 * @param receivers the list of agents to send the map to
 	 */
-	public ShareMapBehaviour(Agent a, long period,MapRepresentation mymap, List<String> receivers) {
+	public ShareMapBehaviour(Agent a, AgentMeta info) {
 		super();
-		this.myMap=mymap;
-		this.receivers=receivers;	
+		this.info = info;
+		this.myMap=info.getMyMap();
+		this.receivers=info.getList_agentNames();
 	}
 
 	/**
@@ -53,6 +57,7 @@ public class ShareMapBehaviour extends SimpleBehaviour{
 
 	@Override
 	public void action() {
+		this.myMap = info.getMyMap();
 		System.out.println("Trying to broadcast");
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
 		msg.setProtocol("SHARE-TOPO");
@@ -72,7 +77,7 @@ public class ShareMapBehaviour extends SimpleBehaviour{
 		MessageTemplate msgTemplate=MessageTemplate.and(
 				MessageTemplate.MatchProtocol("SHARE-TOPO"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-		ACLMessage msgReceived=this.myAgent.receive(msgTemplate);
+		ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 500);
 		if (msgReceived!=null) {
 			System.out.println("Trying to read");
 			SerializableSimpleGraph<String, MapAttribute> sgreceived=null;
@@ -82,11 +87,14 @@ public class ShareMapBehaviour extends SimpleBehaviour{
 				e.printStackTrace();
 			}
 			this.myMap.mergeMap(sgreceived);
+			this.info.setMyMap(this.myMap);
+			System.out.println("Received map");
+
 		}
 	}
 
 	@Override
-	public boolean done() {
-		return false;
+	public int onEnd() {
+		return 727;
 	}
 }

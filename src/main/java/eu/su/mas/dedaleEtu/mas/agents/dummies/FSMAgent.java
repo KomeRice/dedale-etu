@@ -2,10 +2,7 @@ package eu.su.mas.dedaleEtu.mas.agents.dummies;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
-import eu.su.mas.dedaleEtu.mas.behaviours.ExploCoopBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.ExploSoloBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.ExploringBehaviour;
-import eu.su.mas.dedaleEtu.mas.behaviours.SendPingBehaviour;
+import eu.su.mas.dedaleEtu.mas.behaviours.*;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
@@ -48,9 +45,14 @@ public class FSMAgent extends AbstractDedaleAgent {
 
         behaviours.registerFirstState(new ExploringBehaviour(this,info),"Exploring");
         behaviours.registerState(new SendPingBehaviour(this,info),"Pinging");
+        behaviours.registerState(new DispatcherBehaviour(this,info),"Receiving");
+        behaviours.registerState(new ShareMapBehaviour(this,info),"Sharing");
 
         behaviours.registerTransition("Exploring","Pinging",1);
-        behaviours.registerTransition("Pinging","Exploring",2);
+        behaviours.registerTransition("Pinging","Receiving",2);
+        behaviours.registerTransition("Receiving","Exploring",3);
+        behaviours.registerTransition("Receiving","Sharing",727);
+        behaviours.registerTransition("Sharing","Exploring",727);
 
 
 
