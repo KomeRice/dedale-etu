@@ -2,25 +2,41 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 
 import jade.util.leap.Serializable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AgentMeta implements Serializable {
-    private List<String> list_agentNames;
+    //todo: smart send/receive feature, delta? register already sent info and send the differences depending on receiver
+    //todo: universal message format, taking maps, wumpus, positions and else into account
+    private List<String> listReceiverAgents;
     private MapRepresentation myMap;
     private List<String> openNodes;
     private Set<String> closedNodes;
+    private List<Position> interests;
 
-    public AgentMeta(List<String> list_agentNames) {
-        this.list_agentNames = list_agentNames;
+    public AgentMeta(List<String> listReceiverAgents) {
+        this.listReceiverAgents = listReceiverAgents;
         this.openNodes = new ArrayList<String>();
         this.closedNodes=new HashSet<String>();
+        this.interests = new ArrayList<Position>();
     }
 
-    public List<String> getList_agentNames() {
-        return list_agentNames;
+    public List<Position> getInterests() {
+        return interests;
+    }
+
+    public boolean addInterest(Position pos){
+        for(Position p : interests){
+            if(Objects.equals(p.getNodeName(), pos.getNodeName())){
+                return false;
+            }
+        }
+
+        interests.add(pos);
+        return true;
+    }
+
+    public List<String> getListReceiverAgents() {
+        return listReceiverAgents;
     }
 
     public List<String> getOpenNodes() {
@@ -31,8 +47,8 @@ public class AgentMeta implements Serializable {
         return closedNodes;
     }
 
-    public void setList_agentNames(List<String> list_agentNames) {
-        this.list_agentNames = list_agentNames;
+    public void setListReceiverAgents(List<String> listReceiverAgents) {
+        this.listReceiverAgents = listReceiverAgents;
     }
 
     public void setMyMap(MapRepresentation myMap) {

@@ -1,16 +1,12 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Date;
-import java.util.List;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class SendPingBehaviour extends OneShotBehaviour {
@@ -34,7 +30,7 @@ public class SendPingBehaviour extends OneShotBehaviour {
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
 			msg.setContent("Hello World, I'm at "+myPosition);
 
-			for (String agentName : info.getList_agentNames()) {
+			for (String agentName : info.getListReceiverAgents()) {
 				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			}
 			

@@ -5,6 +5,7 @@ import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
+import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
@@ -23,6 +24,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
+        state = 1;
         if(this.info.getMyMap() ==null )
             this.info.setMyMap(new MapRepresentation());
 
@@ -32,7 +34,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
         if (myPosition!=null){
             //List of observable from the agent's current position
             List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
-
+            Position.GeneratePositionFromObservations(lobs,info);
             try {
                 this.myAgent.doWait(300);
             } catch (Exception e) {
@@ -78,12 +80,13 @@ public class ExploringBehaviour extends OneShotBehaviour {
                     nextNode = this.info.getMyMap().getShortestPath(myPosition, this.info.getOpenNodes().get(0)).get(0);
                 }
             }
+
             ((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
         }
     }
 
     @Override
     public int onEnd() {
-        return 1; // pinging;
+        return state; // pinging;
     }
 }
