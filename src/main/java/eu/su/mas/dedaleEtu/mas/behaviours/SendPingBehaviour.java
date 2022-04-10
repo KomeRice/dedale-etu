@@ -1,9 +1,12 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.time.Instant;
+import java.util.Objects;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
+import eu.su.mas.dedaleEtu.mas.messages.MetaMessage;
+import eu.su.mas.dedaleEtu.mas.messages.PingMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -21,12 +24,12 @@ public class SendPingBehaviour extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-		String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-		ACLMessage msg=new ACLMessage(ACLMessage.INFORM);
-		msg.setSender(this.myAgent.getAID());
-		msg.setProtocol("PING");
-		long now = Instant.now().toEpochMilli();
-		if (myPosition!=""){
+		String myPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
+
+		if (!Objects.equals(myPosition, "")){
+			PingMessage msg = new PingMessage(this.myAgent.getAID(),
+					myPosition,
+					Instant.now().toEpochMilli());
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
 			msg.setContent("Hello World, I'm at "+myPosition);
 
