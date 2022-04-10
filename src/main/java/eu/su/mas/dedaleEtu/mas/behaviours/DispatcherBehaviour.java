@@ -21,7 +21,20 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         MessageTemplate msgTemplate = MessageTemplate.MatchProtocol("PING");
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if(msgReceived != null){
+            // System.out.println("RECEIVED A PING " + msgReceived.getContent());
+            this.info.flagBlockedNode(msgReceived);
             endCode = 727;
+        }
+        else{
+            this.info.clearBlockedNodes();
+        }
+        if(msgReceived2 != null){
+            try {
+                AgentMeta agm = (AgentMeta) msgReceived2.getContentObject();
+                System.out.println(agm.getNextNode());
+            } catch (UnreadableException e) {
+                e.printStackTrace();
+            }
         }
     }
 

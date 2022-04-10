@@ -9,6 +9,7 @@ import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
         //0) Retrieve the current position
         String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
+        // TODO: Smarter target node decision
         if (myPosition!=null){
             //List of observable from the agent's current position
             List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
@@ -48,20 +50,19 @@ public class ExploringBehaviour extends OneShotBehaviour {
             this.info.getMyMap().addNode(myPosition, MapRepresentation.MapAttribute.closed);
 
             //2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
-            String nextNode=null;
-            Iterator<Couple<String, List<Couple<Observation, Integer>>>> iter=lobs.iterator();
-            while(iter.hasNext()){
-                String nodeId=iter.next().getLeft();
-                if (!this.info.getClosedNodes().contains(nodeId)){
-                    if (!this.info.getOpenNodes().contains(nodeId)){
+            for (Couple<String, List<Couple<Observation, Integer>>> lob : lobs) {
+                String nodeId = lob.getLeft();
+                if (!this.info.getClosedNodes().contains(nodeId)) {
+                    if (!this.info.getOpenNodes().contains(nodeId)) {
                         this.info.getOpenNodes().add(nodeId);
                         this.info.getMyMap().addNode(nodeId, MapRepresentation.MapAttribute.open);
                         this.info.getMyMap().addEdge(myPosition, nodeId);
-                    }else{
+                    } else {
                         //the node exist, but not necessarily the edge
                         this.info.getMyMap().addEdge(myPosition, nodeId);
                     }
-                    if (nextNode==null) nextNode=nodeId;
+                    if (this.info.getTargetNode() == null && !this.info.isNodeBlocked(nodeId))
+                        this.info.setTargetNode(nodeId, new ArrayList<String>(){{ add(nodeId); }});
                 }
             }
 
@@ -70,7 +71,26 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 //Explo finished
                 state = -1; //-1 = finished
                 System.out.println("Exploration successufully done, behaviour removed.");
-            }else{
+            } else {
+                if(!this.info.hasTargetNode()){
+                    // try to go for another open node
+                    for(String n : this.info.getOpenNodes()){
+                        List<String> pathToNode = this.info.getMyMap().getShortestPath(myPosition, n);
+                        boolean discard = false;
+                        for(String step : pathToNode){
+                            if(this.info.isNodeBlocked(step)){
+                                discard = true;
+                                break;
+                            };
+                        }
+                        if(discard) continue;
+                        this.info.setTargetNode(n, pathToNode);
+                        break;
+                    }
+                }
+
+
+                /*
                 //4) select next move.
                 //4.1 If there exist one open node directly reachable, go for it,
                 //	 otherwise choose one from the openNode list, compute the shortestPath and go for it
@@ -81,7 +101,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 }
             }
 
-            ((AbstractDedaleAgent)this.myAgent).moveTo(nextNode);
+            ((AbstractDedaleAgent)this.myAgent).moveTo(this.info.getNextNode());
         }
     }
 
