@@ -28,6 +28,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         else{
             this.info.clearBlockedNodes();
         }
+        /*
         if(msgReceived2 != null){
             try {
                 AgentMeta agm = (AgentMeta) msgReceived2.getContentObject();
@@ -35,7 +36,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
-        }
+        }*/
     }
 
     @Override

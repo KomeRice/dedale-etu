@@ -1,5 +1,6 @@
 package eu.su.mas.dedaleEtu.mas.knowledge;
 
+import jade.lang.acl.ACLMessage;
 import jade.util.leap.Serializable;
 
 import java.util.*;

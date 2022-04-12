@@ -98,7 +98,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                     //no directly accessible openNode
                     //chose one, compute the path and take the first step.
                     nextNode = this.info.getMyMap().getShortestPath(myPosition, this.info.getOpenNodes().get(0)).get(0);
-                }
+                }*/
             }
 
             ((AbstractDedaleAgent)this.myAgent).moveTo(this.info.getNextNode());
