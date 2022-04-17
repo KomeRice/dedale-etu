@@ -6,13 +6,10 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.Position;
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class ExploringBehaviour extends OneShotBehaviour {
     private AgentMeta info;
@@ -44,8 +41,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
             }
 
             //1) remove the current node from openlist and add it to closedNodes.
-            this.info.getClosedNodes().add(myPosition);
-            this.info.getOpenNodes().remove(myPosition);
+            this.info.updatePosition(myPosition);
 
             this.info.getMyMap().addNode(myPosition, MapRepresentation.MapAttribute.closed);
 
@@ -53,14 +49,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
             for (Couple<String, List<Couple<Observation, Integer>>> lob : lobs) {
                 String nodeId = lob.getLeft();
                 if (!this.info.getClosedNodes().contains(nodeId)) {
-                    if (!this.info.getOpenNodes().contains(nodeId)) {
-                        this.info.getOpenNodes().add(nodeId);
-                        this.info.getMyMap().addNode(nodeId, MapRepresentation.MapAttribute.open);
-                        this.info.getMyMap().addEdge(myPosition, nodeId);
-                    } else {
-                        //the node exist, but not necessarily the edge
-                        this.info.getMyMap().addEdge(myPosition, nodeId);
-                    }
+                    this.info.updateMaps(myPosition,nodeId);
                     if (this.info.getTargetNode() == null && !this.info.isNodeBlocked(nodeId))
                         this.info.setTargetNode(nodeId, new ArrayList<String>(){{ add(nodeId); }});
                 }
@@ -77,6 +66,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                     for(String n : this.info.getOpenNodes()){
                         List<String> pathToNode = this.info.getMyMap().getShortestPath(myPosition, n);
                         boolean discard = false;
+                        //TODO BUG sometime pathToNode is null
                         for(String step : pathToNode){
                             if(this.info.isNodeBlocked(step)){
                                 discard = true;

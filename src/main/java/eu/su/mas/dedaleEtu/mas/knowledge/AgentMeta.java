@@ -1,5 +1,6 @@
 package eu.su.mas.dedaleEtu.mas.knowledge;
 
+import dataStructures.tuple.Couple;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Serializable;
 
@@ -16,6 +17,9 @@ public class AgentMeta implements Serializable {
     private Hashtable<String,String> blockedNodes;
     private String targetNode = null;
     private List<String> currentTrajectory;
+    private String lastReceiver ="";
+
+    private Hashtable<String,MapData> toShare ;
 
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
@@ -24,6 +28,35 @@ public class AgentMeta implements Serializable {
         this.interests = new ArrayList<Position>();
         this.blockedNodes = new Hashtable<>();
         this.currentTrajectory = new LinkedList<>();
+
+        this.toShare = new Hashtable<>();
+
+    }
+
+    public void updateMaps(String myPosition, String nodeId){
+        if (!this.getOpenNodes().contains(nodeId)) {
+            this.getOpenNodes().add(nodeId);
+            this.getMyMap().addNode(nodeId, MapRepresentation.MapAttribute.open);
+            this.getMyMap().addEdge(myPosition, nodeId);
+
+            for (String receiver : listReceiverAgents){
+                this.toShare.computeIfAbsent(receiver,k-> new MapData()).addNode(myPosition,nodeId);
+            }
+        } else {
+            //the node exist, but not necessarily the edge
+            this.getMyMap().addEdge(myPosition, nodeId);
+            for (String receiver : listReceiverAgents){
+                this.toShare.computeIfAbsent(receiver,k-> new MapData()).addEdge(myPosition,nodeId);
+            }
+        }
+    }
+
+    public void updatePosition(String myPosition){
+        this.getClosedNodes().add(myPosition);
+        this.getOpenNodes().remove(myPosition);
+        for (String receiver : listReceiverAgents){
+            this.toShare.computeIfAbsent(receiver,k-> new MapData()).addNewPosition(myPosition);
+        }
     }
 
     public List<Position> getInterests() {
@@ -101,4 +134,37 @@ public class AgentMeta implements Serializable {
     public MapRepresentation getMyMap() {
         return myMap;
     }
+
+    public void setLastReceiver(String lastReceiver) {
+        this.lastReceiver = lastReceiver;
+    }
+
+    public String getLastReceiver() {
+        return lastReceiver;
+    }
+
+    public MapData getToSendMap(String receiver){
+        MapData mapData =  this.toShare.get(receiver);
+        this.toShare.replace(receiver,new MapData());
+        return mapData;
+    }
+
+    public void mergeMap(MapData sgreceived){
+        for (String node : sgreceived.getOpenNodes()){
+            this.myMap.addNode(node,MapRepresentation.MapAttribute.open);
+            if (!this.openNodes.contains(node)){
+                this.openNodes.add(node);
+            }
+        }
+        for (Couple<String,String> c : sgreceived.getEdges()){
+            this.myMap.addEdge(c.getLeft(),c.getRight());
+        }
+        for (String closed : sgreceived.getClosedNodes()){
+            this.myMap.addNode(closed,MapRepresentation.MapAttribute.closed);
+            if (!this.closedNodes.contains(closed)){
+                this.closedNodes.add(closed);
+            }
+        }
+    }
+
 }

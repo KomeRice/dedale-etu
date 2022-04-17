@@ -23,6 +23,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         if(msgReceived != null){
             // System.out.println("RECEIVED A PING " + msgReceived.getContent());
             this.info.flagBlockedNode(msgReceived);
+            this.info.setLastReceiver(msgReceived.getSender().getLocalName());
             endCode = 727;
         }
         else{
