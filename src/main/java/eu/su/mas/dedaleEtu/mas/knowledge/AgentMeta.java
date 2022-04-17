@@ -156,15 +156,16 @@ public class AgentMeta implements Serializable {
                 this.openNodes.add(node);
             }
         }
-        for (Couple<String,String> c : sgreceived.getEdges()){
-            this.myMap.addEdge(c.getLeft(),c.getRight());
-        }
         for (String closed : sgreceived.getClosedNodes()){
             this.myMap.addNode(closed,MapRepresentation.MapAttribute.closed);
             if (!this.closedNodes.contains(closed)){
                 this.closedNodes.add(closed);
             }
         }
+        for (Couple<String,String> c : sgreceived.getEdges()){
+            this.myMap.addEdge(c.getLeft(),c.getRight());
+        }
+
     }
 
 }
