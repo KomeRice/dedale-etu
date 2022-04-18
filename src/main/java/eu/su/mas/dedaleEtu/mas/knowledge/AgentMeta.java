@@ -152,12 +152,15 @@ public class AgentMeta implements Serializable {
     public void mergeMap(MapData sgreceived){
         for (String node : sgreceived.getOpenNodes()){
             this.myMap.addNode(node,MapRepresentation.MapAttribute.open);
-            if (!this.openNodes.contains(node)){
+            if (!this.openNodes.contains(node) && !this.closedNodes.contains(node)){
                 this.openNodes.add(node);
             }
         }
         for (String closed : sgreceived.getClosedNodes()){
             this.myMap.addNode(closed,MapRepresentation.MapAttribute.closed);
+            if(this.openNodes.contains(closed)){
+                this.openNodes.remove(closed);
+            }
             if (!this.closedNodes.contains(closed)){
                 this.closedNodes.add(closed);
             }

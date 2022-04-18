@@ -66,7 +66,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                     for(String n : this.info.getOpenNodes()){
                         List<String> pathToNode = this.info.getMyMap().getShortestPath(myPosition, n);
                         boolean discard = false;
-                        //TODO BUG sometime pathToNode is null
+                        //TODO BUG when reaching a case ocupped by a wumpus
                         for(String step : pathToNode){
                             if(this.info.isNodeBlocked(step)){
                                 discard = true;
