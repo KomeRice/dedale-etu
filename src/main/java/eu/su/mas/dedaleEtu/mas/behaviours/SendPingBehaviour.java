@@ -31,7 +31,7 @@ public class SendPingBehaviour extends OneShotBehaviour {
 					myPosition,
 					Instant.now().toEpochMilli());
 			//System.out.println("Agent "+this.myAgent.getLocalName()+ " is trying to reach its friends");
-			msg.setContent("Hello World, I'm at "+myPosition);
+			msg.setContent(myPosition);
 
 			for (String agentName : info.getListReceiverAgents()) {
 				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));

@@ -7,6 +7,8 @@ import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.behaviours.OneShotBehaviour;
+import net.sourceforge.plantuml.Run;
+import org.omg.SendingContext.RunTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +30,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
 
         //0) Retrieve the current position
         String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-
+        this.info.setMyPosition(myPosition);
         // TODO: Smarter target node decision
         if (myPosition!=null){
             //List of observable from the agent's current position
@@ -63,35 +65,30 @@ public class ExploringBehaviour extends OneShotBehaviour {
             } else {
                 if(!this.info.hasTargetNode()){
                     // try to go for another open node
-                    for(String n : this.info.getOpenNodes()){
-                        List<String> pathToNode = this.info.getMyMap().getShortestPath(myPosition, n);
-                        boolean discard = false;
-                        //TODO BUG when reaching a case ocupped by a wumpus
-                        for(String step : pathToNode){
-                            if(this.info.isNodeBlocked(step)){
-                                discard = true;
-                                break;
-                            };
-                        }
-                        if(discard) continue;
-                        this.info.setTargetNode(n, pathToNode);
-                        break;
+                    this.info.findTrajectory(myPosition);
+                }
+            }
+            String nextPos = "";
+            nextPos = this.info.getNextNode();
+            System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
+
+            try {
+                if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
+                    System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
+                    if(nextPos.equals(this.info.getTargetNode())) {
+                        System.out.println("REACHED NODE " + this.info.getTargetNode());
+                        this.info.setTargetReached();
+                        System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
                     }
                 }
-
-
-                /*
-                //4) select next move.
-                //4.1 If there exist one open node directly reachable, go for it,
-                //	 otherwise choose one from the openNode list, compute the shortestPath and go for it
-                if (nextNode==null) {
-                    //no directly accessible openNode
-                    //chose one, compute the path and take the first step.
-                    nextNode = this.info.getMyMap().getShortestPath(myPosition, this.info.getOpenNodes().get(0)).get(0);
-                }*/
+                else{
+                    System.out.println("CANCELING MOVE TO " + nextPos);
+                    this.info.cancelMove(nextPos);
+                }
+            } catch (RuntimeException e){
+                System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
             }
 
-            ((AbstractDedaleAgent)this.myAgent).moveTo(this.info.getNextNode());
         }
     }
 

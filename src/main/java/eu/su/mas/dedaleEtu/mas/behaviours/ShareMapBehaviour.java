@@ -51,7 +51,6 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 		ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 500);
 		if (msgReceived!=null) {
-			System.out.println("Trying to read");
 			MapData sgreceived=null;
 			try {
 				sgreceived = (MapData)msgReceived.getContentObject();
@@ -59,8 +58,7 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 				e.printStackTrace();
 			}
 			this.info.mergeMap(sgreceived);
-			System.out.println("Received map");
-
+			this.info.findTrajectory(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
 		}
 	}
 

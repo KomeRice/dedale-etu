@@ -18,6 +18,7 @@ public class AgentMeta implements Serializable {
     private String targetNode = null;
     private List<String> currentTrajectory;
     private String lastReceiver ="";
+    private String myPosition ="";
 
     private Hashtable<String,MapData> toShare ;
 
@@ -63,6 +64,31 @@ public class AgentMeta implements Serializable {
         return interests;
     }
 
+    public boolean isTrajectoryEmpty(){
+        return currentTrajectory.isEmpty();
+    }
+
+    public void findTrajectory(String myPosition){
+        for(String n : this.getOpenNodes()){
+            if(n.equals(myPosition))
+                continue;
+            System.out.println("CONSIDERING " + n);
+            List<String> pathToNode = this.getMyMap().getShortestPath(myPosition, n);
+            if(pathToNode == null)
+                continue;
+            boolean discard = false;
+            for(String step : pathToNode){
+                if(this.isNodeBlocked(step)){
+                    discard = true;
+                    break;
+                };
+            }
+            if(discard) continue;
+            this.setTargetNode(n, pathToNode);
+            break;
+        }
+    }
+
     public boolean addInterest(Position pos){
         for(Position p : interests){
             if(Objects.equals(p.getNodeName(), pos.getNodeName())){
@@ -91,11 +117,19 @@ public class AgentMeta implements Serializable {
     }
 
     public String getNextNode(){
-        String out = this.currentTrajectory.remove(0);
-        if(this.currentTrajectory.isEmpty()){
-            this.setTargetReached();
+        String out;
+        try{
+            out = this.currentTrajectory.remove(0);
+        }
+        catch (IndexOutOfBoundsException e){
+            System.out.println("Died");
+            out = "";
         }
         return out;
+    }
+
+    public void cancelMove(String node){
+        this.currentTrajectory.add(0,node);
     }
 
     public String getTargetNode() {
@@ -105,6 +139,7 @@ public class AgentMeta implements Serializable {
     public void setTargetNode(String targetNode, List<String> path) {
         this.targetNode = targetNode;
         this.currentTrajectory = path;
+        System.out.println("SET TARGET TO " + targetNode);
     }
 
     public boolean hasTargetNode() {
@@ -151,6 +186,9 @@ public class AgentMeta implements Serializable {
 
     public void mergeMap(MapData sgreceived){
         for (String node : sgreceived.getOpenNodes()){
+            if (this.myPosition.equals(node)){
+                continue;
+            }
             this.myMap.addNode(node,MapRepresentation.MapAttribute.open);
             if (!this.openNodes.contains(node) && !this.closedNodes.contains(node)){
                 this.openNodes.add(node);
@@ -170,5 +208,11 @@ public class AgentMeta implements Serializable {
         }
 
     }
+    public String getMyPosition() {
+        return myPosition;
+    }
 
+    public void setMyPosition(String myPosition) {
+        this.myPosition = myPosition;
+    }
 }
