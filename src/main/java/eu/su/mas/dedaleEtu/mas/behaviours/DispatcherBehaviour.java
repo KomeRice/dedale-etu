@@ -23,12 +23,26 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         if(msgReceived != null){
             // System.out.println("RECEIVED A PING " + msgReceived.getContent());
             this.info.flagBlockedNode(msgReceived);
-            this.info.setLastReceiver(msgReceived.getSender().getLocalName());
-            endCode = 727;
+            String lastReceiver = msgReceived.getSender().getLocalName();
+            this.info.setLastReceiver(lastReceiver);
+            if (info.didMet(lastReceiver)){
+                endCode = 727; // did met
+            }else{
+                endCode = 10; // not met yet
+            }
         }
         else{
             this.info.clearBlockedNodes();
         }
+
+        MessageTemplate msgTemplate2 = MessageTemplate.MatchProtocol("BLOCKED");
+        msgReceived = this.myAgent.receive(msgTemplate2);
+        if (msgReceived != null){
+            String lastReceiver = msgReceived.getSender().getLocalName();
+            this.info.setLastReceiver(lastReceiver);
+            endCode = 9;//BLOCKED
+        }
+
     }
 
     @Override

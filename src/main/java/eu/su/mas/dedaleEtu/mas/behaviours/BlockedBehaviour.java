@@ -28,6 +28,6 @@ public class BlockedBehaviour extends OneShotBehaviour {
 
     @Override
     public int onEnd() {
-        return state;
+        return state; //3to receive 1 to explo
     }
 }

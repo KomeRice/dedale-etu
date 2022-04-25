@@ -1,23 +1,40 @@
 package eu.su.mas.dedaleEtu.mas.knowledge;
 
+import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.env.Observation;
+import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import jade.util.leap.Serializable;
 
 public class AgentSpecs implements Serializable {
-    private int type;
+    private String type;
     private int goldCap;
     private int diamondCap;
-    private int strentgh;
-    private int lockpinck;
+    private int strength;
+    private int lockpick;
 
-    public AgentSpecs(int type, int goldCap, int diamondCap, int strentgh, int lockpinck) {
-        this.type = type;
-        this.goldCap = goldCap;
-        this.diamondCap = diamondCap;
-        this.strentgh = strentgh;
-        this.lockpinck = lockpinck;
+    public AgentSpecs(AbstractDedaleAgent a) {
+        this.type = a.getMyTreasureType().getName();
+        for (Couple<Observation,Integer> c : a.getBackPackFreeSpace()) {
+            if (c.getLeft() == Observation.GOLD){
+                this.goldCap = c.getRight();
+            }
+            if (c.getLeft() == Observation.DIAMOND){
+                this.diamondCap = c.getRight();
+            }
+        }
+        for (Couple<Observation,Integer> c : a.getMyExpertise()){
+            if (c.getLeft() == Observation.STRENGH){
+                this.strength = c.getRight();
+            }
+            if (c.getLeft() == Observation.LOCKPICKING){
+                this.lockpick = c.getRight();
+            }
+        }
+
+
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
@@ -29,12 +46,12 @@ public class AgentSpecs implements Serializable {
         return diamondCap;
     }
 
-    public int getStrentgh() {
-        return strentgh;
+    public int getStrength() {
+        return strength;
     }
 
-    public int getLockpinck() {
-        return lockpinck;
+    public int getLockpick() {
+        return lockpick;
     }
 
 

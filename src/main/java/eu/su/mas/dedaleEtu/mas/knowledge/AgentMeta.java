@@ -3,13 +3,11 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 import dataStructures.tuple.Couple;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Serializable;
-import javafx.geometry.Pos;
 
 import java.util.*;
 
 public class AgentMeta implements Serializable {
-    //todo: smart send/receive feature, delta? register already sent info and send the differences depending on receiver
-    //todo: universal message format, taking maps, wumpus, positions and else into account
+
     private List<String> listReceiverAgents;
     private MapRepresentation myMap;
     private List<String> openNodes;
@@ -19,12 +17,19 @@ public class AgentMeta implements Serializable {
     private String targetNode = null;
     private List<String> currentTrajectory;
     private String lastReceiver ="";
+
+    private Hashtable<String,AgentSpecs> agentSpecsHashtable;
+
     private String myPosition ="";
 
     private Hashtable<String,MapData> toShare ;
 
     private String rdvPoint = "";
+    private List<String> met;
     private int prio;
+
+
+    private boolean exploEnded = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
@@ -37,6 +42,8 @@ public class AgentMeta implements Serializable {
         this.blockedNodes = new Hashtable<>();
         this.currentTrajectory = new LinkedList<>();
 
+        this.agentSpecsHashtable = new Hashtable<>();
+        this.met = new ArrayList<>();
         this.prio = new Random().nextInt(100);
 
     }
@@ -227,5 +234,29 @@ public class AgentMeta implements Serializable {
         for (Position p : interests){
             addInterest(p);
         }
+    }
+
+    public String getRdvPoint() {
+        return rdvPoint;
+    }
+
+    public void setRdvPoint(String rdvPoint) {
+        this.rdvPoint = rdvPoint;
+    }
+
+    public void addMet(String name){
+        met.add(name);
+    }
+
+    public boolean didMet(String name){
+        return met.contains(name);
+    }
+
+    public void addSpecs(String name, AgentSpecs a){
+        agentSpecsHashtable.computeIfAbsent(name,k->a);
+    }
+
+    public void setExploEnded(){
+        exploEnded = true;
     }
 }

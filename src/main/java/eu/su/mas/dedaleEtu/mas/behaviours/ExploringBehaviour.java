@@ -61,7 +61,8 @@ public class ExploringBehaviour extends OneShotBehaviour {
             //3) while openNodes is not empty, continues.
             if (this.info.getOpenNodes().isEmpty()){
                 //Explo finished
-                state = -1; //-1 = finished
+                info.setExploEnded();
+                state = 2; //-1 = finished
                 System.out.println("Exploration successufully done, behaviour removed.");
             } else {
                 if(!this.info.hasTargetNode()){
