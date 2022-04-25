@@ -1,19 +1,23 @@
 package eu.su.mas.dedaleEtu.mas.messages;
 
+import dataStructures.tuple.Couple;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
+import eu.su.mas.dedaleEtu.mas.knowledge.MapData;
+import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MetaMessage extends ACLMessage {
-    public MetaMessage(AID sender, AgentMeta info, long timestamp){
+    public MetaMessage(AID sender, MapData mapData, List<Position> interest, long timestamp){
         super(ACLMessage.INFORM);
         this.setSender(sender);
         this.setProtocol("META");
         this.setPostTimeStamp(timestamp);
         try{
-            this.setContentObject(info);
+            this.setContentObject(new Couple<MapData,List<Position>>(mapData,interest));
         }
         catch(IOException e){
             this.setContent("Failed to pack agent meta");

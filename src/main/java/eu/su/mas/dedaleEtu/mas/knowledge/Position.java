@@ -4,6 +4,7 @@ import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.env.Observation;
 import jade.util.leap.Serializable;
 
+import java.time.Instant;
 import java.util.List;
 
 public class Position implements Serializable {
@@ -13,6 +14,9 @@ public class Position implements Serializable {
     private boolean lockOpen;
     private int lockpickReq;
     private int strengthReq;
+    private long timeStamp;
+
+
 
     private Position(Observation treasureType, int treasureValue, String nodeName, boolean lockOpen, int lockpickReq, int strengthReq) {
         this.treasureType = treasureType;
@@ -21,6 +25,11 @@ public class Position implements Serializable {
         this.lockOpen = lockOpen;
         this.lockpickReq = lockpickReq;
         this.strengthReq = strengthReq;
+        this.timeStamp = Instant.now().toEpochMilli();
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
     }
 
     public Observation getTreasureType() {
@@ -45,6 +54,17 @@ public class Position implements Serializable {
 
     public int getStrengthReq() {
         return strengthReq;
+    }
+
+    public void updatePos(Position p){
+        if (p.getTimeStamp()> this.getTimeStamp()){
+            this.treasureType = p.getTreasureType();
+            this.treasureValue = p.getTreasureValue();
+            this.lockOpen = p.isLockOpen();
+            this.lockpickReq = p.getLockpickReq();
+            this.strengthReq = p.getStrengthReq();
+            this.timeStamp = p.getTimeStamp();
+        }
     }
 
     public static void GeneratePositionFromObservations(List<Couple<String, List<Couple<Observation,Integer>>>> lobs, AgentMeta a){

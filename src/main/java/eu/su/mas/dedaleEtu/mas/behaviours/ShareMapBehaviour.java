@@ -1,15 +1,20 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
 
 import dataStructures.serializableGraph.SerializableSimpleGraph;
 
+import dataStructures.tuple.Couple;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapData;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation.MapAttribute;
 
+import eu.su.mas.dedaleEtu.mas.knowledge.Position;
+import eu.su.mas.dedaleEtu.mas.messages.MetaMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -32,32 +37,29 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 
 	@Override
 	public void action() {
-		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setProtocol("SHARE-TOPO");
-		msg.setSender(this.myAgent.getAID());
 		String receiver = this.info.getLastReceiver();
-
-		msg.addReceiver(new AID(receiver,AID.ISLOCALNAME));
 		MapData mapData = this.info.getToSendMap(receiver);
-		try {					
-			msg.setContentObject(mapData);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		List<Position> interests = this.info.getInterests();
+		MetaMessage msg = new MetaMessage(this.myAgent.getAID(),
+				mapData,interests,
+				Instant.now().toEpochMilli());
+		msg.addReceiver(new AID(receiver,AID.ISLOCALNAME));
+
 		((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		
 		MessageTemplate msgTemplate=MessageTemplate.and(
-				MessageTemplate.MatchProtocol("SHARE-TOPO"),
+				MessageTemplate.MatchProtocol("META"),
 				MessageTemplate.MatchPerformative(ACLMessage.INFORM));
 		ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 500);
 		if (msgReceived!=null) {
-			MapData sgreceived=null;
+			Couple<MapData,List<Position>> sgreceived=null;
 			try {
-				sgreceived = (MapData)msgReceived.getContentObject();
+				sgreceived = (Couple<MapData,List<Position>>)msgReceived.getContentObject();
 			} catch (UnreadableException e) {
 				e.printStackTrace();
 			}
-			this.info.mergeMap(sgreceived);
+			this.info.mergeMap(sgreceived.getLeft());
+			this.info.mergeInterest(sgreceived.getRight());
 			this.info.findTrajectory(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
 		}
 	}

@@ -47,12 +47,17 @@ public class FSMAgent extends AbstractDedaleAgent {
         behaviours.registerState(new SendPingBehaviour(this,info),"Pinging");
         behaviours.registerState(new DispatcherBehaviour(this,info),"Receiving");
         behaviours.registerState(new ShareMapBehaviour(this,info),"Sharing");
+        behaviours.registerState(new FinishedStateBehaviour(this,info),"Finished");
 
         behaviours.registerTransition("Exploring","Pinging",1);
         behaviours.registerTransition("Pinging","Receiving",2);
         behaviours.registerTransition("Receiving","Exploring",3);
         behaviours.registerTransition("Receiving","Sharing",727);
         behaviours.registerTransition("Sharing","Exploring",727);
+
+        behaviours.registerTransition("Exploring","Finished",-1);
+        behaviours.registerTransition("Finished","Finished",1);
+
         //behaviours.registerTransition("Exploring","Exploring",1);
 
 

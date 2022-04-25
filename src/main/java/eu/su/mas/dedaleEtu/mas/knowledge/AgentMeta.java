@@ -3,6 +3,7 @@ package eu.su.mas.dedaleEtu.mas.knowledge;
 import dataStructures.tuple.Couple;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Serializable;
+import javafx.geometry.Pos;
 
 import java.util.*;
 
@@ -22,15 +23,21 @@ public class AgentMeta implements Serializable {
 
     private Hashtable<String,MapData> toShare ;
 
+    private String rdvPoint = "";
+    private int prio;
+
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
+
         this.openNodes = new ArrayList<String>();
         this.closedNodes=new HashSet<String>();
         this.interests = new ArrayList<Position>();
+        this.toShare = new Hashtable<>();
+
         this.blockedNodes = new Hashtable<>();
         this.currentTrajectory = new LinkedList<>();
 
-        this.toShare = new Hashtable<>();
+        this.prio = new Random().nextInt(100);
 
     }
 
@@ -90,12 +97,12 @@ public class AgentMeta implements Serializable {
     }
 
     public boolean addInterest(Position pos){
-        for(Position p : interests){
-            if(Objects.equals(p.getNodeName(), pos.getNodeName())){
+        for (Position p : interests) {
+            if (Objects.equals(p.getNodeName(), pos.getNodeName())) {
+                p.updatePos(pos);
                 return false;
             }
         }
-
         interests.add(pos);
         return true;
     }
@@ -214,5 +221,11 @@ public class AgentMeta implements Serializable {
 
     public void setMyPosition(String myPosition) {
         this.myPosition = myPosition;
+    }
+
+    public void mergeInterest(List<Position> interests){
+        for (Position p : interests){
+            addInterest(p);
+        }
     }
 }

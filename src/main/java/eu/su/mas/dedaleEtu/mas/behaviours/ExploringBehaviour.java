@@ -16,6 +16,7 @@ import java.util.List;
 public class ExploringBehaviour extends OneShotBehaviour {
     private AgentMeta info;
     private int state;
+    private int blockedCounter = 0;
 
     public ExploringBehaviour(AbstractDedaleAgent a, AgentMeta info) {
         super(a);
@@ -84,6 +85,10 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 else{
                     System.out.println("CANCELING MOVE TO " + nextPos);
                     this.info.cancelMove(nextPos);
+                    this.blockedCounter = this.blockedCounter +1;
+                    if (blockedCounter == 4){
+                        state = 6; //Blocked
+                    }
                 }
             } catch (RuntimeException e){
                 System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);

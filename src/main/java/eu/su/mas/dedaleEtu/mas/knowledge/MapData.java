@@ -12,8 +12,6 @@ public class MapData implements Serializable {
     private List<String> closedNodes;
     private List<Couple<String,String>> edges;
 
-
-
     public MapData() {
         this.openNodes = new ArrayList<>();
         this.edges = new ArrayList<>();
