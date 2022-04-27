@@ -6,14 +6,16 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import jade.util.leap.Serializable;
 
 public class AgentSpecs implements Serializable {
-    private String type;
+    private int prio;
+    private Observation type;
     private int goldCap;
     private int diamondCap;
     private int strength;
     private int lockpick;
 
-    public AgentSpecs(AbstractDedaleAgent a) {
-        this.type = a.getMyTreasureType().getName();
+    public AgentSpecs(AbstractDedaleAgent a,int prio) {
+        this.prio = prio;
+        this.type = a.getMyTreasureType();
         for (Couple<Observation,Integer> c : a.getBackPackFreeSpace()) {
             if (c.getLeft() == Observation.GOLD){
                 this.goldCap = c.getRight();
@@ -32,7 +34,11 @@ public class AgentSpecs implements Serializable {
         }
     }
 
-    public String getType() {
+    public int getPrio() {
+        return prio;
+    }
+
+    public Observation getType() {
         return type;
     }
 
@@ -52,7 +58,18 @@ public class AgentSpecs implements Serializable {
         return lockpick;
     }
 
+    public void setType(Observation type) {
+        this.type = type;
+    }
 
-
+    public int getCap(){
+        if(type == Observation.DIAMOND){
+            return diamondCap;
+        }else if (type == Observation.GOLD){
+            return goldCap;
+        }else{
+            return Math.max(goldCap,diamondCap);
+        }
+    }
 
 }

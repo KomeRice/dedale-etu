@@ -67,6 +67,7 @@ public class FSMAgent extends AbstractDedaleAgent {
         behaviours.registerTransition("Collecting","Receiving",2);
         behaviours.registerTransition("Receiving","Collecting",4);
         behaviours.registerTransition("Blocked","Collecting",2);
+        behaviours.registerTransition("Collecting","Collecting",0);
 
         behaviours.registerTransition("Collecting","Finished",-1);
         behaviours.registerTransition("Finished","Finished",1);

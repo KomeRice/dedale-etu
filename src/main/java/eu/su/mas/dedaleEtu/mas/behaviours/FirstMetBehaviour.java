@@ -12,6 +12,7 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class FirstMetBehaviour extends OneShotBehaviour {
     private AgentMeta info;
@@ -25,7 +26,11 @@ public class FirstMetBehaviour extends OneShotBehaviour {
     public void action() {
         String receiver = this.info.getLastReceiver();
         String pos = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
-        AgentSpecs agentSpecs = new AgentSpecs((AbstractDedaleAgent) myAgent);
+        if(!Objects.equals(info.getRdvPoint(), "")){
+            pos = info.getRdvPoint();
+        }
+        AgentSpecs agentSpecs = new AgentSpecs((AbstractDedaleAgent) myAgent,info.getPrio());
+        info.addSpecs(myAgent.getLocalName(),agentSpecs);
         FirstMetMessage toSend = new FirstMetMessage(this.myAgent.getAID(),
                 pos,agentSpecs,
                 Instant.now().toEpochMilli());

@@ -28,6 +28,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
             if (info.didMet(lastReceiver)){
                 endCode = 727; // did met
             }else{
+                info.addMet(lastReceiver);
                 endCode = 10; // not met yet
             }
         }

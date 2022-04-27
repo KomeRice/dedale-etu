@@ -44,6 +44,9 @@ public class Position implements Serializable {
         return nodeName;
     }
 
+    public void setTreasureValue(int treasureValue) {
+        this.treasureValue = treasureValue;
+    }
     public boolean isLockOpen() {
         return lockOpen;
     }

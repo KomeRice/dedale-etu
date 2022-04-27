@@ -4,23 +4,25 @@ import dataStructures.tuple.Couple;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MapData implements Serializable {
 
-    private List<String> openNodes;
-    private List<String> closedNodes;
+    private Set<String> openNodes;
+    private Set<String> closedNodes;
     private List<Couple<String,String>> edges;
 
     public MapData() {
-        this.openNodes = new ArrayList<>();
+        this.openNodes = new HashSet<>();
         this.edges = new ArrayList<>();
-        this.closedNodes = new ArrayList<>();
+        this.closedNodes = new HashSet<>();
     }
-    public MapData(List<String> openNodes){
+    public MapData(Set<String> openNodes){
         this.openNodes = openNodes;
         this.edges = new ArrayList<>();
-        this.closedNodes = new ArrayList<>();
+        this.closedNodes = new HashSet<>();
     }
 
     public MapData newMapFromOld(){
@@ -47,7 +49,7 @@ public class MapData implements Serializable {
         this.edges.add(new Couple<>(myPosition,node));
     }
 
-    public List<String> getOpenNodes() {
+    public Set<String> getOpenNodes() {
         return openNodes;
     }
 
@@ -55,7 +57,7 @@ public class MapData implements Serializable {
         return edges;
     }
 
-    public List<String> getClosedNodes() {
+    public Set<String> getClosedNodes() {
         return closedNodes;
     }
 }

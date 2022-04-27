@@ -63,31 +63,31 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 //Explo finished
                 info.setExploEnded();
                 state = 2; //-1 = finished
-                System.out.println("Exploration successufully done, behaviour removed.");
+                info.setCollectStep(0);
+                System.out.println("Exploration successufully done");
             } else {
                 if(!this.info.hasTargetNode()){
                     // try to go for another open node
                     this.info.findTrajectory(myPosition);
                 }
             }
-            String nextPos = "";
-            nextPos = this.info.getNextNode();
-            System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
+            String nextPos = this.info.getNextNode();
+            //System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
 
             try {
                 if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
-                    System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
+                    //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
+                    this.blockedCounter = 0;
                     if(nextPos.equals(this.info.getTargetNode())) {
-                        System.out.println("REACHED NODE " + this.info.getTargetNode());
+                        //System.out.println("REACHED NODE " + this.info.getTargetNode());
                         this.info.setTargetReached();
-                        this.blockedCounter = 0;
-                        System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
+                        //System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
                     }
                 }
                 else{
-                    System.out.println("CANCELING MOVE TO " + nextPos);
+                    //System.out.println("CANCELING MOVE TO " + nextPos);
                     this.info.cancelMove(nextPos);
-                    this.blockedCounter = this.blockedCounter +1;
+                    //this.blockedCounter = this.blockedCounter +1;
                     if (blockedCounter == 4){
                         state = 6; //Blocked
                     }

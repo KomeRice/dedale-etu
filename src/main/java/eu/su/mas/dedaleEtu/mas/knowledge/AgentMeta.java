@@ -10,7 +10,7 @@ public class AgentMeta implements Serializable {
 
     private List<String> listReceiverAgents;
     private MapRepresentation myMap;
-    private List<String> openNodes;
+    private Set<String> openNodes;
     private Set<String> closedNodes;
     private List<Position> interests;
     private Hashtable<String,String> blockedNodes;
@@ -28,19 +28,20 @@ public class AgentMeta implements Serializable {
     private List<String> met;
     private int prio;
 
-
+    private List<Position> myPlan;
 
     private int blockStep = -1;
     private int collectStep = -1;
+    private Position targetTreasure;
 
     private boolean exploEnded = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
 
-        this.openNodes = new ArrayList<String>();
+        this.openNodes = new HashSet<>();
         this.closedNodes=new HashSet<String>();
-        this.interests = new ArrayList<Position>();
+        this.interests = new ArrayList<>();
         this.toShare = new Hashtable<>();
 
         this.blockedNodes = new Hashtable<>();
@@ -54,17 +55,16 @@ public class AgentMeta implements Serializable {
 
     public void updateMaps(String myPosition, String nodeId) {
         if (!this.getOpenNodes().contains(nodeId)) {
-            this.getOpenNodes().add(nodeId);
-            this.getMyMap().addNode(nodeId, MapRepresentation.MapAttribute.open);
-            this.getMyMap().addEdge(myPosition, nodeId);
+            openNodes.add(nodeId);
+            myMap.addNode(nodeId, MapRepresentation.MapAttribute.open);
+            myMap.addEdge(myPosition, nodeId);
 
             for (String receiver : listReceiverAgents) {
                 this.toShare.computeIfAbsent(receiver, k -> new MapData()).addNode(myPosition, nodeId);
-                this.toShare.computeIfAbsent(receiver, k -> new MapData()).addEdge(myPosition, nodeId);
             }
         } else {
             //the node exist, but not necessarily the edge
-            this.getMyMap().addEdge(myPosition, nodeId);
+            myMap.addEdge(myPosition, nodeId);
             for (String receiver : listReceiverAgents) {
                 this.toShare.computeIfAbsent(receiver, k -> new MapData()).addEdge(myPosition, nodeId);
             }
@@ -72,8 +72,8 @@ public class AgentMeta implements Serializable {
     }
 
     public void updatePosition(String myPosition){
-        this.getClosedNodes().add(myPosition);
-        this.getOpenNodes().remove(myPosition);
+        closedNodes.add(myPosition);
+        openNodes.remove(myPosition);
         for (String receiver : listReceiverAgents){
             this.toShare.computeIfAbsent(receiver,k-> new MapData()).addNewPosition(myPosition);
         }
@@ -91,7 +91,7 @@ public class AgentMeta implements Serializable {
         for(String n : this.getOpenNodes()){
             if(n.equals(myPosition))
                 continue;
-            System.out.println("CONSIDERING " + n);
+            //System.out.println("CONSIDERING " + n);
             List<String> pathToNode = this.getMyMap().getShortestPath(myPosition, n);
             if(pathToNode == null)
                 continue;
@@ -158,7 +158,7 @@ public class AgentMeta implements Serializable {
     public void setTargetNode(String targetNode, List<String> path) {
         this.targetNode = targetNode;
         this.currentTrajectory = path;
-        System.out.println("SET TARGET TO " + targetNode);
+        //System.out.println("SET TARGET TO " + targetNode);
     }
 
     public boolean hasTargetNode() {
@@ -169,7 +169,7 @@ public class AgentMeta implements Serializable {
         return listReceiverAgents;
     }
 
-    public List<String> getOpenNodes() {
+    public Set<String> getOpenNodes() {
         return openNodes;
     }
 
@@ -209,6 +209,10 @@ public class AgentMeta implements Serializable {
         return mapData;
     }
 
+    public Hashtable<String, AgentSpecs> getAgentSpecsHashtable() {
+        return agentSpecsHashtable;
+    }
+
     public void mergeMap(MapData sgreceived){
         for (String node : sgreceived.getOpenNodes()){
             if (this.myPosition.equals(node)){
@@ -245,6 +249,10 @@ public class AgentMeta implements Serializable {
 
     public String getRdvPoint() {
         return rdvPoint;
+    }
+
+    public int getPrio() {
+        return prio;
     }
 
     public void setRdvPoint(String rdvPoint) {
@@ -286,4 +294,19 @@ public class AgentMeta implements Serializable {
         this.collectStep = collectStep;
     }
 
+    public List<Position> getMyPlan() {
+        return myPlan;
+    }
+
+    public void setMyPlan(List<Position> myPlan) {
+        this.myPlan = myPlan;
+    }
+
+    public Position getTargetTreasure() {
+        return targetTreasure;
+    }
+
+    public void setTargetTreasure(Position targetTreasure) {
+        this.targetTreasure = targetTreasure;
+    }
 }

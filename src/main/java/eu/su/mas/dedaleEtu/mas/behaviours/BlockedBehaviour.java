@@ -5,7 +5,6 @@ import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import jade.core.behaviours.OneShotBehaviour;
 
 public class BlockedBehaviour extends OneShotBehaviour {
-    private int step;
     // step ==0 -> find another route
     //step == 1 -> broadcast im blocked
     //stp 2 -> send prio message and receive it
