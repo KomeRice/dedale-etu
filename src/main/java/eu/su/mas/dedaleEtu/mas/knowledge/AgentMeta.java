@@ -309,4 +309,8 @@ public class AgentMeta implements Serializable {
     public void setTargetTreasure(Position targetTreasure) {
         this.targetTreasure = targetTreasure;
     }
+
+    public List<String> getCurrentTrajectory() {
+        return currentTrajectory;
+    }
 }
