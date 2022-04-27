@@ -30,8 +30,6 @@ public class AgentSpecs implements Serializable {
                 this.lockpick = c.getRight();
             }
         }
-
-
     }
 
     public String getType() {

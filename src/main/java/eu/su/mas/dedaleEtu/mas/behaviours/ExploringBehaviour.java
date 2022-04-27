@@ -80,6 +80,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                     if(nextPos.equals(this.info.getTargetNode())) {
                         System.out.println("REACHED NODE " + this.info.getTargetNode());
                         this.info.setTargetReached();
+                        this.blockedCounter = 0;
                         System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
                     }
                 }

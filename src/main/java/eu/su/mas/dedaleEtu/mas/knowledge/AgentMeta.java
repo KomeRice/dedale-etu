@@ -29,6 +29,10 @@ public class AgentMeta implements Serializable {
     private int prio;
 
 
+
+    private int blockStep = -1;
+    private int collectStep = -1;
+
     private boolean exploEnded = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
@@ -44,24 +48,25 @@ public class AgentMeta implements Serializable {
 
         this.agentSpecsHashtable = new Hashtable<>();
         this.met = new ArrayList<>();
-        this.prio = new Random().nextInt(100);
+        this.prio = new Random().nextInt(Integer.MAX_VALUE);
 
     }
 
-    public void updateMaps(String myPosition, String nodeId){
+    public void updateMaps(String myPosition, String nodeId) {
         if (!this.getOpenNodes().contains(nodeId)) {
             this.getOpenNodes().add(nodeId);
             this.getMyMap().addNode(nodeId, MapRepresentation.MapAttribute.open);
             this.getMyMap().addEdge(myPosition, nodeId);
 
-            for (String receiver : listReceiverAgents){
-                this.toShare.computeIfAbsent(receiver,k-> new MapData()).addNode(myPosition,nodeId);
+            for (String receiver : listReceiverAgents) {
+                this.toShare.computeIfAbsent(receiver, k -> new MapData()).addNode(myPosition, nodeId);
+                this.toShare.computeIfAbsent(receiver, k -> new MapData()).addEdge(myPosition, nodeId);
             }
         } else {
             //the node exist, but not necessarily the edge
             this.getMyMap().addEdge(myPosition, nodeId);
-            for (String receiver : listReceiverAgents){
-                this.toShare.computeIfAbsent(receiver,k-> new MapData()).addEdge(myPosition,nodeId);
+            for (String receiver : listReceiverAgents) {
+                this.toShare.computeIfAbsent(receiver, k -> new MapData()).addEdge(myPosition, nodeId);
             }
         }
     }
@@ -194,7 +199,13 @@ public class AgentMeta implements Serializable {
 
     public MapData getToSendMap(String receiver){
         MapData mapData =  this.toShare.get(receiver);
-        this.toShare.replace(receiver,new MapData());
+        if (mapData != null){
+            this.toShare.replace(receiver,mapData.newMapFromOld());
+        }else{
+            this.toShare.replace(receiver,new MapData());
+        }
+
+
         return mapData;
     }
 
@@ -203,19 +214,15 @@ public class AgentMeta implements Serializable {
             if (this.myPosition.equals(node)){
                 continue;
             }
-            this.myMap.addNode(node,MapRepresentation.MapAttribute.open);
             if (!this.openNodes.contains(node) && !this.closedNodes.contains(node)){
                 this.openNodes.add(node);
+                this.myMap.addNode(node,MapRepresentation.MapAttribute.open);
             }
         }
         for (String closed : sgreceived.getClosedNodes()){
             this.myMap.addNode(closed,MapRepresentation.MapAttribute.closed);
-            if(this.openNodes.contains(closed)){
-                this.openNodes.remove(closed);
-            }
-            if (!this.closedNodes.contains(closed)){
-                this.closedNodes.add(closed);
-            }
+            this.openNodes.remove(closed);
+            this.closedNodes.add(closed);
         }
         for (Couple<String,String> c : sgreceived.getEdges()){
             this.myMap.addEdge(c.getLeft(),c.getRight());
@@ -241,7 +248,9 @@ public class AgentMeta implements Serializable {
     }
 
     public void setRdvPoint(String rdvPoint) {
-        this.rdvPoint = rdvPoint;
+        if (this.rdvPoint == ""){
+            this.rdvPoint = rdvPoint;
+        }
     }
 
     public void addMet(String name){
@@ -258,5 +267,23 @@ public class AgentMeta implements Serializable {
 
     public void setExploEnded(){
         exploEnded = true;
+        collectStep = 0;
     }
+
+    public int getBlockStep() {
+        return blockStep;
+    }
+
+    public void setBlockStep(int blockStep) {
+        this.blockStep = blockStep;
+    }
+
+    public int getCollectStep() {
+        return collectStep;
+    }
+
+    public void setCollectStep(int collectStep) {
+        this.collectStep = collectStep;
+    }
+
 }

@@ -29,7 +29,13 @@ public class CollectingBehavior extends OneShotBehaviour {
 
     @Override
     public void action() {
+        switch (info.getCollectStep()){
+            case 0:
+                info.setTargetNode(info.getRdvPoint(),info.getMyMap().getShortestPath(info.getMyPosition(), info.getRdvPoint()));
+                String nextPos = info.getNextNode();
 
+                break;
+        }
     }
 
     @Override

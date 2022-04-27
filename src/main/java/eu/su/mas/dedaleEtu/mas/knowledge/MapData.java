@@ -17,6 +17,22 @@ public class MapData implements Serializable {
         this.edges = new ArrayList<>();
         this.closedNodes = new ArrayList<>();
     }
+    public MapData(List<String> openNodes){
+        this.openNodes = openNodes;
+        this.edges = new ArrayList<>();
+        this.closedNodes = new ArrayList<>();
+    }
+
+    public MapData newMapFromOld(){
+        MapData m = new MapData(openNodes);
+        for (Couple<String,String> c : edges){
+            if (m.getOpenNodes().contains(c.getRight()) || m.getOpenNodes().contains(c.getLeft()) ){
+                m.addEdge(c.getLeft(),c.getRight());
+            }
+        }
+        return m;
+    }
+
     public void addNewPosition(String myPosition){
         this.openNodes.remove(myPosition);
         this.closedNodes.add(myPosition);
