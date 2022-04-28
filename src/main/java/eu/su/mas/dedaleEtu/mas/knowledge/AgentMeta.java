@@ -27,6 +27,7 @@ public class AgentMeta implements Serializable {
     private String rdvPoint = "";
     private List<String> met;
     private int prio;
+    private List<String> blockedPath;
 
     private List<Position> myPlan;
 
@@ -312,5 +313,24 @@ public class AgentMeta implements Serializable {
 
     public List<String> getCurrentTrajectory() {
         return currentTrajectory;
+    }
+
+    public List<String> getBlockedPath() {
+        return blockedPath;
+    }
+
+    public void setBlockedPath(List<String> blockedPath) {
+        this.blockedPath = blockedPath;
+    }
+
+    public String getNextBlockedPath(){
+        if(!blockedPath.isEmpty()){
+            return blockedPath.remove(0);
+        }
+        return null;
+    }
+
+    public boolean isExploEnded() {
+        return exploEnded;
     }
 }

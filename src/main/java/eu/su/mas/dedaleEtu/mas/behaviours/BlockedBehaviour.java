@@ -1,6 +1,7 @@
 package eu.su.mas.dedaleEtu.mas.behaviours;
 
 import dataStructures.tuple.Couple;
+import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentSpecs;
@@ -64,17 +65,47 @@ public class BlockedBehaviour extends OneShotBehaviour {
                         List<String> sgreceived = null;
                         try {
                             sgreceived = (List<String>) msgReceived.getContentObject();
+                            sgreceived.remove(0);
                         } catch (UnreadableException e) {
                             e.printStackTrace();
                         }
                         // definir ce que l'on veut faire du chemin bloqué
+                        info.setBlockedPath(sgreceived);
+                        info.setBlockStep(4);
                     }
                 }
+                break;
+            case 4:
+                List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
+                String nextPos = info.getNextBlockedPath();
+                for (Couple<String, List<Couple<Observation, Integer>>> lob : lobs) {
+                    String nodeId = lob.getLeft();
+                    if (!nodeId.equals(nextPos)) {
+                        nextPos = nodeId;
+                        info.setBlockStep(5);
+                        break;
+                    }
+                }
+                ((AbstractDedaleAgent)this.myAgent).moveTo(nextPos);
+                break;
+            case 5:
+                try {
+                    this.myAgent.doWait(5000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                info.setBlockStep(-1);
+                if(info.isExploEnded()){
+                    state = 2;
+                }else {
+                    state = 1;
+                }
+                break;
         }
     }
 
     @Override
     public int onEnd() {
-        return state; //3to receive 1 to explo
+        return state; //3to receive 2 to collect 1 to explo
     }
 }
