@@ -22,8 +22,10 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if(msgReceived != null){
             // System.out.println("RECEIVED A PING " + msgReceived.getContent());
+            this.info.clearBlockedNodes();
             this.info.flagBlockedNode(msgReceived);
             String lastReceiver = msgReceived.getSender().getLocalName();
+
             this.info.setLastReceiver(lastReceiver);
             if (info.didMet(lastReceiver)){
                 endCode = 727; // did met
@@ -31,9 +33,6 @@ public class DispatcherBehaviour extends OneShotBehaviour {
                 info.addMet(lastReceiver);
                 endCode = 10; // not met yet
             }
-        }
-        else{
-            this.info.clearBlockedNodes();
         }
 
         MessageTemplate msgTemplate2 = MessageTemplate.MatchProtocol("BLOCKED");

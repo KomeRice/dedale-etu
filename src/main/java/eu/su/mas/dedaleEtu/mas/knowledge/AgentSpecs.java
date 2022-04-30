@@ -5,6 +5,8 @@ import eu.su.mas.dedale.env.Observation;
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import jade.util.leap.Serializable;
 
+import java.util.Random;
+
 public class AgentSpecs implements Serializable {
     private int prio;
     private Observation type;
@@ -13,8 +15,8 @@ public class AgentSpecs implements Serializable {
     private int strength;
     private int lockpick;
 
-    public AgentSpecs(AbstractDedaleAgent a,int prio) {
-        this.prio = prio;
+    public AgentSpecs(AbstractDedaleAgent a) {
+        this.prio = new Random().nextInt(Integer.MAX_VALUE);;
         this.type = a.getMyTreasureType();
         for (Couple<Observation,Integer> c : a.getBackPackFreeSpace()) {
             if (c.getLeft() == Observation.GOLD){
@@ -32,6 +34,16 @@ public class AgentSpecs implements Serializable {
                 this.lockpick = c.getRight();
             }
         }
+    }
+
+    public AgentSpecs(Integer[] arg) {
+        this.prio = new Random().nextInt(Integer.MAX_VALUE);
+        this.type = Observation.ANY_TREASURE;
+        this.goldCap = arg[0];
+        this.diamondCap = arg[1];
+        this.strength = arg[2];
+        this.lockpick = arg[3];
+
     }
 
     public int getPrio() {

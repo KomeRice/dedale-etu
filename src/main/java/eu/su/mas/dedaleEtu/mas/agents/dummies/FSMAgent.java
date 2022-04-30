@@ -4,11 +4,14 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.*;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
+import eu.su.mas.dedaleEtu.mas.knowledge.AgentSpecs;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class FSMAgent extends AbstractDedaleAgent {
@@ -24,20 +27,23 @@ public class FSMAgent extends AbstractDedaleAgent {
         final Object[] args = getArguments();
 
         List<String> list_agentNames=new ArrayList<String>();
-
+        AgentSpecs ags = null;
         if(args.length==0){
             System.err.println("Error while creating the agent, names of agent to contact expected");
             System.exit(-1);
         }else{
-            int i=2;// WARNING YOU SHOULD ALWAYS START AT 2. This will be corrected in the next release.
-            while (i<args.length) {
-                list_agentNames.add((String)args[i]);
-                i++;
-            }
+//            int i=2;// WARNING YOU SHOULD ALWAYS START AT 2. This will be corrected in the next release.
+//            while (i<args.length) {
+//                list_agentNames.add((String)args[i]);
+//                i++;
+//            }
+            ags = new AgentSpecs((Integer[]) args[2]);
+            list_agentNames.addAll(Arrays.asList((String[]) args[3]));
+
         }
 
         info = new AgentMeta(list_agentNames);
-
+        info.setSpecs(ags);
         List<Behaviour> lb=new ArrayList<Behaviour>();
 
 

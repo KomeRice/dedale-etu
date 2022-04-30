@@ -29,7 +29,7 @@ public class FirstMetBehaviour extends OneShotBehaviour {
         if(!Objects.equals(info.getRdvPoint(), "")){
             pos = info.getRdvPoint();
         }
-        AgentSpecs agentSpecs = new AgentSpecs((AbstractDedaleAgent) myAgent,info.getPrio());
+        AgentSpecs agentSpecs = info.getMySpecs();
         info.addSpecs(myAgent.getLocalName(),agentSpecs);
         FirstMetMessage toSend = new FirstMetMessage(this.myAgent.getAID(),
                 pos,agentSpecs,

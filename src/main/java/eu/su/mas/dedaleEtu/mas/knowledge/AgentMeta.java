@@ -19,6 +19,7 @@ public class AgentMeta implements Serializable {
     private String lastReceiver ="";
 
     private Hashtable<String,AgentSpecs> agentSpecsHashtable;
+    private AgentSpecs mySpecs;
 
     private String myPosition ="";
 
@@ -26,7 +27,6 @@ public class AgentMeta implements Serializable {
 
     private String rdvPoint = "";
     private List<String> met;
-    private int prio;
     private List<String> blockedPath;
 
     private List<Position> myPlan;
@@ -50,7 +50,7 @@ public class AgentMeta implements Serializable {
 
         this.agentSpecsHashtable = new Hashtable<>();
         this.met = new ArrayList<>();
-        this.prio = new Random().nextInt(Integer.MAX_VALUE);
+
 
     }
 
@@ -121,7 +121,7 @@ public class AgentMeta implements Serializable {
     }
 
     public void flagBlockedNode(ACLMessage msg){
-        blockedNodes.put(msg.getContent(), String.valueOf(msg.getSender()));
+        blockedNodes.put(msg.getContent(), String.valueOf(msg.getSender().getLocalName()));
     }
 
     public boolean isNodeBlocked(String node){
@@ -252,9 +252,6 @@ public class AgentMeta implements Serializable {
         return rdvPoint;
     }
 
-    public int getPrio() {
-        return prio;
-    }
 
     public void setRdvPoint(String rdvPoint) {
         if (this.rdvPoint == ""){
@@ -332,5 +329,13 @@ public class AgentMeta implements Serializable {
 
     public boolean isExploEnded() {
         return exploEnded;
+    }
+
+    public void setSpecs(AgentSpecs agentSpecs){
+        this.mySpecs = agentSpecs;
+    }
+
+    public AgentSpecs getMySpecs() {
+        return mySpecs;
     }
 }

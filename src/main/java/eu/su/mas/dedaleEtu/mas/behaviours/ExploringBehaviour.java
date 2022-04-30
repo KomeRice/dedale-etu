@@ -62,6 +62,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
             if (this.info.getOpenNodes().isEmpty()){
                 //Explo finished
                 info.setExploEnded();
+                info.setTargetNode(null,null);
                 state = 2; //-1 = finished
                 info.setCollectStep(0);
                 System.out.println("Exploration successufully done");
@@ -87,8 +88,9 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 else{
                     //System.out.println("CANCELING MOVE TO " + nextPos);
                     this.info.cancelMove(nextPos);
-                    //this.blockedCounter = this.blockedCounter +1;
-                    if (blockedCounter == 4){
+                    this.blockedCounter = this.blockedCounter +1;
+                    if (blockedCounter == 20){
+                        info.setBlockStep(1);
                         state = 6; //Blocked
                     }
                 }
