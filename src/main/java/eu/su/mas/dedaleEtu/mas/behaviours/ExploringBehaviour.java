@@ -64,40 +64,39 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 info.setExploEnded();
                 info.setTargetNode(null,null);
                 state = 2; //-1 = finished
-                info.setCollectStep(0);
-                System.out.println("Exploration successufully done");
+                info.setCollectStep(1);
+
             } else {
-                if(!this.info.hasTargetNode()){
+                if (!this.info.hasTargetNode()) {
                     // try to go for another open node
                     this.info.findTrajectory(myPosition);
                 }
-            }
-            String nextPos = this.info.getNextNode();
-            //System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
 
-            try {
-                if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
-                    //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
-                    this.blockedCounter = 0;
-                    if(nextPos.equals(this.info.getTargetNode())) {
-                        //System.out.println("REACHED NODE " + this.info.getTargetNode());
-                        this.info.setTargetReached();
-                        //System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
-                    }
-                }
-                else{
-                    //System.out.println("CANCELING MOVE TO " + nextPos);
-                    this.info.cancelMove(nextPos);
-                    this.blockedCounter = this.blockedCounter +1;
-                    if (blockedCounter == 20){
-                        info.setBlockStep(1);
-                        state = 6; //Blocked
-                    }
-                }
-            } catch (RuntimeException e){
-                System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
-            }
+                String nextPos = this.info.getNextNode();
+                //System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
 
+                try {
+                    if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
+                        //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
+                        this.blockedCounter = 0;
+                        if (nextPos.equals(this.info.getTargetNode())) {
+                            //System.out.println("REACHED NODE " + this.info.getTargetNode());
+                            this.info.setTargetReached();
+                            //System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
+                        }
+                    } else {
+                        //System.out.println("CANCELING MOVE TO " + nextPos);
+                        this.info.cancelMove(nextPos);
+                        this.blockedCounter = this.blockedCounter + 1;
+                        if (blockedCounter == 20) {
+                            info.setBlockStep(1);
+                            state = 6; //Blocked
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
+                }
+            }
         }
     }
 

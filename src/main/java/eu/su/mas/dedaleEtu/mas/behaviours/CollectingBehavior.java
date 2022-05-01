@@ -15,6 +15,7 @@ public class CollectingBehavior extends OneShotBehaviour {
     private int state;
     private Hashtable<String, AgentSpecs> agentSpecsHashtable;
     private List<Position> interest;
+    private int blockedCounter = 0;
 
     //step 1 return to rdv point
     //step 2 share prio and backpack capacity
@@ -39,6 +40,7 @@ public class CollectingBehavior extends OneShotBehaviour {
 
     @Override
     public void action() {
+        state = 0;
         String nextPos;
         switch (info.getCollectStep()){
             case 0:
@@ -71,10 +73,12 @@ public class CollectingBehavior extends OneShotBehaviour {
                             if(c.getLeft() == agentSpecsHashtable.get(myAgent.getLocalName()).getType()){
                                 if(c.getRight() == 0){
                                     System.out.println("BACKPACK FULL");
+                                    state = -1;//finished
                                 }
                             }
                         }
                     }
+                    info.setMyPosition(((AbstractDedaleAgent) myAgent).getCurrentPosition());
                     Position target = info.getMyPlan().remove(0);
                     info.setTargetTreasure(target);
                     info.setTargetNode(target.getNodeName(),info.getMyMap().getShortestPath(info.getMyPosition(),target.getNodeName()));
@@ -85,6 +89,13 @@ public class CollectingBehavior extends OneShotBehaviour {
                         info.setTargetReached();
                         ((AbstractDedaleAgent) this.myAgent).openLock(info.getTargetTreasure().getTreasureType());
                         ((AbstractDedaleAgent) this.myAgent).pick();
+                    }
+                }else {
+                    this.info.cancelMove(nextPos);
+                    this.blockedCounter = this.blockedCounter + 1;
+                    if (blockedCounter == 20) {
+                        info.setBlockStep(1);
+                        state = 3; //Blocked
                     }
                 }
 
@@ -143,6 +154,7 @@ public class CollectingBehavior extends OneShotBehaviour {
     }
 
     public int getTheoricalSpace(List<Position> pos){
+        if (pos == null) return 0;
         int sum =0;
         for (Position p : pos){
             sum = sum + p.getTreasureValue();

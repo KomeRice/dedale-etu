@@ -59,24 +59,30 @@ public class FSMAgent extends AbstractDedaleAgent {
         behaviours.registerState(new FirstMetBehaviour(this,info),"First");
 
         behaviours.registerTransition("Exploring","Pinging",1);
+        behaviours.registerTransition("Exploring","Collecting",2);
+        behaviours.registerTransition("Exploring","Blocked",6);
+
         behaviours.registerTransition("Pinging","Receiving",2);
+        behaviours.registerTransition("Sharing","Exploring",727);
+
         behaviours.registerTransition("Receiving","Exploring",3);
         behaviours.registerTransition("Receiving","Sharing",727);
-        behaviours.registerTransition("Sharing","Exploring",727);
         behaviours.registerTransition("Receiving","Blocked",9);
+        behaviours.registerTransition("Receiving","First",10);
+        behaviours.registerTransition("Receiving","Collecting",4);
+
         behaviours.registerTransition("Blocked","Receiving",3);
         behaviours.registerTransition("Blocked","Exploring",1);
-        behaviours.registerTransition("Receiving","First",10);
-        behaviours.registerTransition("First","Sharing",1);
-        behaviours.registerTransition("Exploring","Collecting",2);
-        behaviours.registerTransition("Collecting","Blocked",3);
-        behaviours.registerTransition("Collecting","Receiving",2);
-        behaviours.registerTransition("Receiving","Collecting",4);
         behaviours.registerTransition("Blocked","Collecting",2);
-        behaviours.registerTransition("Collecting","Collecting",0);
         behaviours.registerTransition("Blocked","Blocked",0);
 
+        behaviours.registerTransition("First","Sharing",1);
+
+        behaviours.registerTransition("Collecting","Blocked",3);
+        behaviours.registerTransition("Collecting","Receiving",2);
+        behaviours.registerTransition("Collecting","Collecting",0);
         behaviours.registerTransition("Collecting","Finished",-1);
+
         behaviours.registerTransition("Finished","Finished",1);
 
         //behaviours.registerTransition("Exploring","Exploring",1);
