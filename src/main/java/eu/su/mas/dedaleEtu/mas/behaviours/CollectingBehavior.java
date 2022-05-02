@@ -42,6 +42,7 @@ public class CollectingBehavior extends OneShotBehaviour {
     public void action() {
         state = 0;
         String nextPos;
+        info.setMyPosition(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
         switch (info.getCollectStep()){
             case 0:
                 if (!info.hasTargetNode()){
@@ -65,40 +66,54 @@ public class CollectingBehavior extends OneShotBehaviour {
 
 
             case 2:
+                if (info.getMyPosition().equals(info.getTargetNode())){
+                    info.setTargetReached();
+                    ((AbstractDedaleAgent) this.myAgent).openLock(info.getTargetTreasure().getTreasureType());
+                    ((AbstractDedaleAgent) this.myAgent).pick();
+                    System.out.println(myAgent.getLocalName() + "  Picked Treasure");
+                }
                 if (!info.hasTargetNode()){
                     if (info.getMyPlan().isEmpty()){
                         info.setCollectStep(0);
                         System.out.println("Plan vide");
                         for(Couple<Observation,Integer> c : ((AbstractDedaleAgent) this.myAgent).getBackPackFreeSpace()){
-                            if(c.getLeft() == agentSpecsHashtable.get(myAgent.getLocalName()).getType()){
+                            if(c.getLeft() == info.getMySpecs().getType()){
                                 if(c.getRight() == 0){
-                                    System.out.println("BACKPACK FULL");
+                                    System.out.println("BACKPACK FULL Finished");
                                     state = -1;//finished
+                                    break;
+                                }else {
+                                    System.out.println("BACKPACK not full Finished");
+                                    state = -1;//finished
+                                    break;
                                 }
                             }
                         }
+                    }else {
+                        Position target = info.getMyPlan().remove(0);
+                        info.setTargetTreasure(target);
+                        info.setTargetNode(target.getNodeName(), info.getMyMap().getShortestPath(info.getMyPosition(), target.getNodeName()));
                     }
-                    info.setMyPosition(((AbstractDedaleAgent) myAgent).getCurrentPosition());
-                    Position target = info.getMyPlan().remove(0);
-                    info.setTargetTreasure(target);
-                    info.setTargetNode(target.getNodeName(),info.getMyMap().getShortestPath(info.getMyPosition(),target.getNodeName()));
                 }
                 nextPos = info.getNextNode();
-                if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
-                    if (nextPos.equals(info.getTargetNode())){
-                        info.setTargetReached();
-                        ((AbstractDedaleAgent) this.myAgent).openLock(info.getTargetTreasure().getTreasureType());
-                        ((AbstractDedaleAgent) this.myAgent).pick();
+                if (nextPos != ""){
+                    if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
+                        this.blockedCounter = 0;
+                    }else{
+                        this.info.cancelMove(nextPos);
+                        this.blockedCounter = this.blockedCounter + 1;
+                        if (blockedCounter == 20) {
+                            info.setBlockStep(1);
+                            state = 3; //Blocked
+                        }
                     }
                 }else {
-                    this.info.cancelMove(nextPos);
-                    this.blockedCounter = this.blockedCounter + 1;
+                    this.blockedCounter++;
                     if (blockedCounter == 20) {
                         info.setBlockStep(1);
                         state = 3; //Blocked
                     }
                 }
-
         }
     }
 

@@ -25,7 +25,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
-        state = 1;
+        state = 0;
         if(this.info.getMyMap() ==null )
             this.info.setMyMap(new MapRepresentation());
 
@@ -74,30 +74,42 @@ public class ExploringBehaviour extends OneShotBehaviour {
 
                 String nextPos = this.info.getNextNode();
                 //System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
-
-                try {
-                    if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
-                        //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
-                        this.blockedCounter = 0;
-                        if (nextPos.equals(this.info.getTargetNode())) {
-                            //System.out.println("REACHED NODE " + this.info.getTargetNode());
-                            this.info.setTargetReached();
-                            //System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
+                if(nextPos != null){
+                    try {
+                        if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
+                            //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
+                            this.blockedCounter = 0;
+                            if (nextPos.equals(this.info.getTargetNode())) {
+                                //System.out.println("REACHED NODE " + this.info.getTargetNode());
+                                this.info.setTargetReached();
+                                //System.out.println("CLEARED TARGET NODE " + this.info.getTargetNode());
+                            }
+                        } else {
+                            //System.out.println("CANCELING MOVE TO " + nextPos);
+                            this.info.cancelMove(nextPos);
+                            this.blockedCounter = this.blockedCounter + 1;
+                            if (blockedCounter == 20) {
+                                info.setBlockStep(1);
+                                state = 6; //Blocked
+                            }
                         }
-                    } else {
-                        //System.out.println("CANCELING MOVE TO " + nextPos);
-                        this.info.cancelMove(nextPos);
+                    } catch (RuntimeException e) {
+                        System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
                         this.blockedCounter = this.blockedCounter + 1;
                         if (blockedCounter == 20) {
                             info.setBlockStep(1);
-                            state = 6; //Blocked
+                            state = 3; //Blocked
                         }
                     }
-                } catch (RuntimeException e) {
-                    System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
+                }else {
+                    this.blockedCounter++;
                 }
             }
         }
+        if(info.doPing()){
+            state = 1;
+        }
+        info.switchPing();
     }
 
     @Override

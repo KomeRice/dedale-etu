@@ -51,7 +51,11 @@ public class BlockedBehaviour extends OneShotBehaviour {
             case 3:
                 String receiver = this.info.getLastReceiver();
                 Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
-                if(specs.get(myAgent.getLocalName()).getPrio()>specs.get(receiver).getPrio()){
+                if (!info.didMet(receiver)){
+                    state = 4;//fist meet
+                    break;
+                }
+                if(info.getMySpecs().getPrio()>specs.get(receiver).getPrio()){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());
                     msg2.addReceiver(new AID(receiver,AID.ISLOCALNAME));
@@ -65,7 +69,6 @@ public class BlockedBehaviour extends OneShotBehaviour {
                         List<String> sgreceived = null;
                         try {
                             sgreceived = (List<String>) msgReceived.getContentObject();
-                            sgreceived.remove(0);
                         } catch (UnreadableException e) {
                             e.printStackTrace();
                         }

@@ -36,6 +36,7 @@ public class AgentMeta implements Serializable {
     private Position targetTreasure;
 
     private boolean exploEnded = false;
+    private boolean doPing = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
@@ -337,5 +338,13 @@ public class AgentMeta implements Serializable {
 
     public AgentSpecs getMySpecs() {
         return mySpecs;
+    }
+
+    public boolean doPing() {
+        return doPing;
+    }
+
+    public void switchPing() {
+        doPing = !doPing;
     }
 }
