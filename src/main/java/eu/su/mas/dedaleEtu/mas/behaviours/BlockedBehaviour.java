@@ -48,13 +48,10 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 }
                 ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
                 state = 1; //go to dispatcher
+                break;
             case 3:
                 String receiver = this.info.getLastReceiver();
                 Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
-                if (!info.didMet(receiver)){
-                    state = 4;//fist meet
-                    break;
-                }
                 if(info.getMySpecs().getPrio()>specs.get(receiver).getPrio()){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());

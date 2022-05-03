@@ -12,6 +12,7 @@ import org.omg.SendingContext.RunTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ExploringBehaviour extends OneShotBehaviour {
     private AgentMeta info;
@@ -65,6 +66,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 info.setTargetNode(null,null);
                 state = 2; //-1 = finished
                 info.setCollectStep(1);
+                System.out.println(myAgent.getLocalName() + " Exploring done");
 
             } else {
                 if (!this.info.hasTargetNode()) {
@@ -74,7 +76,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
 
                 String nextPos = this.info.getNextNode();
                 //System.out.println(this.myAgent.getLocalName() +": GO TO " + this.info.getTargetNode() + " FROM " + myPosition + " NEXT NODE " + nextPos);
-                if(nextPos != null){
+                if(!Objects.equals(nextPos, "")){
                     try {
                         if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
                             //System.out.println("MOVE SUCCESSFUL TO " + nextPos + " CONFIRM " + myPosition);
@@ -90,19 +92,26 @@ public class ExploringBehaviour extends OneShotBehaviour {
                             this.blockedCounter = this.blockedCounter + 1;
                             if (blockedCounter == 20) {
                                 info.setBlockStep(1);
+                                System.out.println("Blocked " + myAgent.getLocalName() + " AT " + myPosition);
                                 state = 6; //Blocked
                             }
                         }
-                    } catch (RuntimeException e) {
-                        System.out.println(this.myAgent.getLocalName() + ": DIED WHILE TRYING TO ACCESS: " + nextPos);
+                    }catch(RuntimeException e){
+                        System.out.println("DIED at "+ myPosition );
                         this.blockedCounter = this.blockedCounter + 1;
                         if (blockedCounter == 20) {
                             info.setBlockStep(1);
-                            state = 3; //Blocked
+                            System.out.println("Blocked " + myAgent.getLocalName() + " AT " + myPosition);
+                            state = 6; //Blocked
                         }
                     }
                 }else {
                     this.blockedCounter++;
+                    if (blockedCounter == 20) {
+                        info.setBlockStep(1);
+                        System.out.println("Blocked " + myAgent.getLocalName() + " AT " + myPosition);
+                        state = 6; //Blocked
+                    }
                 }
             }
         }

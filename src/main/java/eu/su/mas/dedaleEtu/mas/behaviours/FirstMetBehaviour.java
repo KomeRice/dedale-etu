@@ -42,7 +42,7 @@ public class FirstMetBehaviour extends OneShotBehaviour {
         MessageTemplate msgTemplate=MessageTemplate.and(
                 MessageTemplate.MatchProtocol("SPECS"),
                 MessageTemplate.MatchPerformative(ACLMessage.INFORM));
-        ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 500);
+        ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 800);
         if (msgReceived!=null) {
             Couple<String, AgentSpecs> sgreceived = null;
             try {
@@ -57,6 +57,9 @@ public class FirstMetBehaviour extends OneShotBehaviour {
 
     @Override
     public int onEnd() {
+        if(info.getBlockStep()>0){
+            return 2;
+        }
         return 1;
     }
 }

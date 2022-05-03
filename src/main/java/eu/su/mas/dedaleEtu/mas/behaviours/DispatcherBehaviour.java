@@ -40,7 +40,14 @@ public class DispatcherBehaviour extends OneShotBehaviour {
         if (msgReceived != null){
             String lastReceiver = msgReceived.getSender().getLocalName();
             this.info.setLastReceiver(lastReceiver);
-            endCode = 9;//BLOCKED
+            info.setBlockStep(3);
+            if(info.didMet(lastReceiver)){
+                endCode = 9;//BLOCKED
+            }else {
+                info.addMet(lastReceiver);
+                endCode = 10;
+            }
+
         }
 
     }

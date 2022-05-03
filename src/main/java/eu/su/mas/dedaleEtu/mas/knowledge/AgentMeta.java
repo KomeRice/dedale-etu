@@ -42,7 +42,7 @@ public class AgentMeta implements Serializable {
         this.listReceiverAgents = listReceiverAgents;
 
         this.openNodes = new HashSet<>();
-        this.closedNodes=new HashSet<String>();
+        this.closedNodes=new HashSet<>();
         this.interests = new ArrayList<>();
         this.toShare = new Hashtable<>();
 
@@ -102,7 +102,7 @@ public class AgentMeta implements Serializable {
                 if(this.isNodeBlocked(step)){
                     discard = true;
                     break;
-                };
+                }
             }
             if(discard) continue;
             this.setTargetNode(n, pathToNode);
@@ -143,7 +143,8 @@ public class AgentMeta implements Serializable {
             out = this.currentTrajectory.remove(0);
         }
         catch (IndexOutOfBoundsException e){
-            System.out.println("Died");
+            System.out.println("no next node");
+            this.clearBlockedNodes();
             out = "";
         }
         return out;
@@ -255,7 +256,7 @@ public class AgentMeta implements Serializable {
 
 
     public void setRdvPoint(String rdvPoint) {
-        if (this.rdvPoint == ""){
+        if (Objects.equals(this.rdvPoint, "")){
             this.rdvPoint = rdvPoint;
         }
     }

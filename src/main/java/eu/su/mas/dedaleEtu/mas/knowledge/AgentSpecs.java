@@ -8,7 +8,7 @@ import jade.util.leap.Serializable;
 import java.util.Random;
 
 public class AgentSpecs implements Serializable {
-    private int prio;
+    private final int prio;
     private Observation type;
     private int goldCap;
     private int diamondCap;
@@ -16,7 +16,7 @@ public class AgentSpecs implements Serializable {
     private int lockpick;
 
     public AgentSpecs(AbstractDedaleAgent a) {
-        this.prio = new Random().nextInt(Integer.MAX_VALUE);;
+        this.prio = new Random().nextInt(Integer.MAX_VALUE);
         this.type = a.getMyTreasureType();
         for (Couple<Observation,Integer> c : a.getBackPackFreeSpace()) {
             if (c.getLeft() == Observation.GOLD){
@@ -84,4 +84,19 @@ public class AgentSpecs implements Serializable {
         }
     }
 
+    public void appointRessources(int value){
+        if (type == Observation.DIAMOND){
+            diamondCap -=value;
+        }else{
+            goldCap -= value;
+        }
+    }
+
+    public void setRessources(int value){
+        if (type == Observation.DIAMOND){
+            diamondCap =value;
+        }else{
+            goldCap = value;
+        }
+    }
 }

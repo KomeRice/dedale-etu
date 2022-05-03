@@ -60,7 +60,6 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 			}
 			this.info.mergeMap(sgreceived.getLeft());
 			this.info.mergeInterest(sgreceived.getRight());
-			this.info.clearBlockedNodes();
 			this.info.findTrajectory(((AbstractDedaleAgent) this.myAgent).getCurrentPosition());
 		}
 	}

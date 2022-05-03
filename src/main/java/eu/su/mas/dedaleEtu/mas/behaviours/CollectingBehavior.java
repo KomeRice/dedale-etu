@@ -62,8 +62,11 @@ public class CollectingBehavior extends OneShotBehaviour {
                 info.setMyPlan(makePlan().get(myAgent.getLocalName()));
                 info.setCollectStep(2);
                 info.setTargetReached();
+                if(info.getMyPlan() == null){
+                    System.out.println("PLAN NON GENERE");
+                    info.setMyPlan(makePlan().get(myAgent.getLocalName()));
+                }
                 break;
-
 
             case 2:
                 if (info.getMyPosition().equals(info.getTargetNode())){
@@ -81,12 +84,13 @@ public class CollectingBehavior extends OneShotBehaviour {
                                 if(c.getRight() == 0){
                                     System.out.println("BACKPACK FULL Finished");
                                     state = -1;//finished
-                                    break;
                                 }else {
                                     System.out.println("BACKPACK not full Finished");
-                                    state = -1;//finished
-                                    break;
+                                    info.getInterests().remove(info.getTargetTreasure());
+                                    agentSpecsHashtable.get(myAgent.getLocalName()).setRessources(c.getRight());
+                                    info.setCollectStep(1);
                                 }
+                                break;
                             }
                         }
                     }else {
@@ -96,7 +100,7 @@ public class CollectingBehavior extends OneShotBehaviour {
                     }
                 }
                 nextPos = info.getNextNode();
-                if (nextPos != ""){
+                if (!Objects.equals(nextPos, "")){
                     if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
                         this.blockedCounter = 0;
                     }else{
@@ -132,7 +136,7 @@ public class CollectingBehavior extends OneShotBehaviour {
             for (String agent : agents){
                 AgentSpecs specs = agentSpecsHashtable.get(agent);
 
-                if(specs.getCap()>getTheoricalSpace(missions.get(agent))){
+                if(specs.getCap()!=0){
                     repass = true;
                 }else {
                     continue;
@@ -151,12 +155,18 @@ public class CollectingBehavior extends OneShotBehaviour {
                         specs.setType(Observation.GOLD);
                     }
                 }
+                if (toAdd == null){
+                    System.out.println("ERROR ON CALCULATING");
+                }
                 missions.computeIfAbsent(agent,k->new ArrayList<>()).add(toAdd);
                 int v = toAdd.getTreasureValue();
                 if (v < specs.getCap()){
                     interest.remove(toAdd);
+                    specs.appointRessources(v);
                 }else {
                     toAdd.setTreasureValue(v-specs.getCap());
+                    Collections.shuffle(interest);
+                    specs.appointRessources(specs.getCap());
                 }
 
                 if (interest.isEmpty()){
@@ -237,10 +247,27 @@ public class CollectingBehavior extends OneShotBehaviour {
     }
 
     public Position getClosest(Position p1, Position p2 , int value){
-        if (p1.getTreasureValue() -value >= p2.getTreasureValue()-value){
-            return p2;
-        }else {
-            return p1;
+        int v1 = p1.getTreasureValue();
+        int v2 = p2.getTreasureValue();
+        if (v1 >= value ){
+            if(v2 >= value) {
+                if (v1 > v2) {
+                    return p2;
+                } else {
+                    return p1;
+                }
+            }else{
+                return p1;
+            }
+        }else{
+            if(v2>=value){
+                return p2;
+            }else{
+                if(v1 > v2){
+                    return p1;
+                }else
+                    return p2;
+            }
         }
     }
 

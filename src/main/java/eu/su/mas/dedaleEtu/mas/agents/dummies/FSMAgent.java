@@ -26,7 +26,7 @@ public class FSMAgent extends AbstractDedaleAgent {
         //get the parameters added to the agent at creation (if any)
         final Object[] args = getArguments();
 
-        List<String> list_agentNames=new ArrayList<String>();
+        List<String> list_agentNames=new ArrayList<>();
         AgentSpecs ags = null;
         if(args.length==0){
             System.err.println("Error while creating the agent, names of agent to contact expected");
@@ -44,7 +44,7 @@ public class FSMAgent extends AbstractDedaleAgent {
 
         info = new AgentMeta(list_agentNames);
         info.setSpecs(ags);
-        List<Behaviour> lb=new ArrayList<Behaviour>();
+        List<Behaviour> lb=new ArrayList<>();
 
 
         FSMBehaviour behaviours = new FSMBehaviour(this);
@@ -78,6 +78,7 @@ public class FSMAgent extends AbstractDedaleAgent {
         behaviours.registerTransition("Blocked","Blocked",0);
 
         behaviours.registerTransition("First","Sharing",1);
+        behaviours.registerTransition("First","Blocked",2);
 
         behaviours.registerTransition("Collecting","Blocked",3);
         behaviours.registerTransition("Collecting","Receiving",2);
