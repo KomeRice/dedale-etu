@@ -30,6 +30,16 @@ public class ExploringBehaviour extends OneShotBehaviour {
         if(this.info.getMyMap() ==null )
             this.info.setMyMap(new MapRepresentation());
 
+        if(this.info.hasExplorationTimedOut()) {
+            System.out.println("EXPLORATION TIMED OUT");
+            info.setExploEnded();
+            info.setTargetNode(null,null);
+            state = 2; //-1 = finished
+            info.setCollectStep(1);
+            System.out.println(myAgent.getLocalName() + " Exploring done");
+            return;
+        }
+
         //0) Retrieve the current position
         String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         this.info.setMyPosition(myPosition);

@@ -4,6 +4,7 @@ import dataStructures.tuple.Couple;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Serializable;
 
+import java.time.Instant;
 import java.util.*;
 
 public class AgentMeta implements Serializable {
@@ -17,6 +18,9 @@ public class AgentMeta implements Serializable {
     private String targetNode = null;
     private List<String> currentTrajectory;
     private String lastReceiver ="";
+
+    private long explorationStart;
+    private final int explorationTimeout = 240000;
 
     private Hashtable<String,AgentSpecs> agentSpecsHashtable;
     private AgentSpecs mySpecs;
@@ -52,7 +56,7 @@ public class AgentMeta implements Serializable {
         this.agentSpecsHashtable = new Hashtable<>();
         this.met = new ArrayList<>();
 
-
+        this.explorationStart = Instant.now().toEpochMilli();
     }
 
     public void updateMaps(String myPosition, String nodeId) {
@@ -249,6 +253,7 @@ public class AgentMeta implements Serializable {
         }
 
     }
+
     public String getMyPosition() {
         return myPosition;
     }
@@ -266,7 +271,6 @@ public class AgentMeta implements Serializable {
     public String getRdvPoint() {
         return rdvPoint;
     }
-
 
     public void setRdvPoint(String rdvPoint) {
         if (Objects.equals(this.rdvPoint, "")){
@@ -360,5 +364,9 @@ public class AgentMeta implements Serializable {
 
     public void switchPing() {
         doPing = !doPing;
+    }
+
+    public boolean hasExplorationTimedOut() {
+        return Instant.now().toEpochMilli() >= explorationStart + explorationTimeout;
     }
 }
