@@ -52,6 +52,10 @@ public class BlockedBehaviour extends OneShotBehaviour {
             case 3:
                 String receiver = this.info.getLastReceiver();
                 Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
+                if(specs == null){
+                    state = 3;
+                    break;
+                }
                 if(info.getMySpecs().getPrio()>specs.get(receiver).getPrio()){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());

@@ -90,6 +90,8 @@ public class AgentMeta implements Serializable {
     }
 
     public void findTrajectory(String myPosition){
+        List<String> shortestPath = null;
+        String node = null;
         for(String n : this.getOpenNodes()){
             if(n.equals(myPosition))
                 continue;
@@ -105,9 +107,17 @@ public class AgentMeta implements Serializable {
                 }
             }
             if(discard) continue;
-            this.setTargetNode(n, pathToNode);
-            break;
+            if (shortestPath == null){
+                shortestPath = pathToNode;
+                node = n;
+            }
+            if (shortestPath.size() > pathToNode.size()){
+                shortestPath = pathToNode;
+                node = n;
+            }
+
         }
+        this.setTargetNode(node, shortestPath);
     }
 
     public boolean addInterest(Position pos){
@@ -144,6 +154,9 @@ public class AgentMeta implements Serializable {
         }
         catch (IndexOutOfBoundsException e){
             System.out.println("no next node");
+            this.clearBlockedNodes();
+            out = "";
+        }catch (NullPointerException e1){
             this.clearBlockedNodes();
             out = "";
         }

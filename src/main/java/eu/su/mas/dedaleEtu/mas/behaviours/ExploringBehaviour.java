@@ -33,7 +33,6 @@ public class ExploringBehaviour extends OneShotBehaviour {
         //0) Retrieve the current position
         String myPosition=((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         this.info.setMyPosition(myPosition);
-        // TODO: Smarter target node decision
         if (myPosition!=null){
             //List of observable from the agent's current position
             List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();//myPosition
