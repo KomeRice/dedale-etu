@@ -42,21 +42,26 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 //find another route
             case 2:
                 String myPosition = ((AbstractDedaleAgent)myAgent).getCurrentPosition();
-                BlockedMessage msg = new BlockedMessage(myAgent.getAID(),myPosition, Instant.now().toEpochMilli());
+                BlockedMessage msg = new BlockedMessage(this.myAgent.getAID(),myPosition, Instant.now().toEpochMilli());
                 for (String agentName : info.getListReceiverAgents()) {
                     msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
                 }
                 ((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
-                state = 1; //go to dispatcher
+                state = 3; //go to dispatcher
                 break;
             case 3:
                 String receiver = this.info.getLastReceiver();
-                Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
-                if(specs == null){
-                    state = 3;
-                    break;
+                if (receiver == null ||receiver == "asm" ){
+                    if(info.isExploEnded()){
+                        state = 2;
+                    }else {
+                        state = 1;
+                    }
                 }
-                if(info.getMySpecs().getPrio()>specs.get(receiver).getPrio()){
+                Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
+                int myPrio = info.getMySpecs().getPrio();
+                int yourPrio = specs.get(receiver).getPrio();
+                if(myPrio>yourPrio){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());
                     msg2.addReceiver(new AID(receiver,AID.ISLOCALNAME));
@@ -78,6 +83,7 @@ public class BlockedBehaviour extends OneShotBehaviour {
                         info.setBlockStep(4);
                     }
                 }
+                info.setBlockStep(5);
                 break;
             case 4:
                 List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();

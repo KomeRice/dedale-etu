@@ -105,6 +105,7 @@ public class Position implements Serializable {
             }
 
             if(unhandledData){
+
                 continue;
             }
 

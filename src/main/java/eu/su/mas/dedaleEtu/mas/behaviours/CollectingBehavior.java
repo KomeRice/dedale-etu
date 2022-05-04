@@ -59,11 +59,29 @@ public class CollectingBehavior extends OneShotBehaviour {
 
 
             case 1:
+                if (stillTreasure(info.getMySpecs().getType())){
+                    Observation a = info.getMySpecs().getType();
+                    state = -1;//NO MORE TREASURE OF THIS TYPE FINISHED
+                    info.setFinished();
+                    System.out.println("BACKPACK not full Finished");
+                    return;
+                }
                 info.setMyPlan(makePlan().get(myAgent.getLocalName()));
                 info.setCollectStep(2);
                 info.setTargetReached();
                 if(info.getMyPlan() == null){
                     System.out.println("PLAN NON GENERE");
+                    for (Couple<Observation,Integer> c :((AbstractDedaleAgent)this.myAgent).getBackPackFreeSpace()){
+                        if (c.getLeft() == info.getMySpecs().getType()){
+                            if(c.getRight() == 0){
+                                System.out.println("BACKPACK FULL Finished");
+                                state = -1;//finished
+                                info.setFinished();
+                                return;
+                            }
+                            info.getMySpecs().setRessources(c.getRight());
+                        }
+                    }
                     info.setMyPlan(makePlan().get(myAgent.getLocalName()));
                 }
                 break;
@@ -77,13 +95,15 @@ public class CollectingBehavior extends OneShotBehaviour {
                 }
                 if (!info.hasTargetNode()){
                     if (info.getMyPlan().isEmpty()){
-                        info.setCollectStep(0);
+                        info.setCollectStep(-1);
                         System.out.println("Plan vide");
                         for(Couple<Observation,Integer> c : ((AbstractDedaleAgent) this.myAgent).getBackPackFreeSpace()){
                             if(c.getLeft() == info.getMySpecs().getType()){
                                 if(c.getRight() == 0){
                                     System.out.println("BACKPACK FULL Finished");
                                     state = -1;//finished
+                                    info.setFinished();
+                                    return;
                                 }else {
                                     System.out.println("BACKPACK not full Finished");
                                     info.getInterests().remove(info.getTargetTreasure());
@@ -271,6 +291,16 @@ public class CollectingBehavior extends OneShotBehaviour {
         }
     }
 
-
+    public boolean stillTreasure(Observation type){
+        if (type == Observation.ANY_TREASURE){
+            return interest.isEmpty();
+        }
+        for (Position p:interest){
+            if(p.getTreasureType() == type){
+                return false;
+            }
+        }
+        return true;
+    }
 
 }

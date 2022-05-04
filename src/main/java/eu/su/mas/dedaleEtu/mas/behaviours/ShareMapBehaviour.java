@@ -66,6 +66,9 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 
 	@Override
 	public int onEnd() {
-		return 727;
+		if(info.isFinished()){
+			return  -1; //finished
+		}
+		return 727; //continue exploring
 	}
 }

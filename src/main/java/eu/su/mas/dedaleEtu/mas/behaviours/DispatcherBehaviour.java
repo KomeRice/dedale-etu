@@ -25,10 +25,10 @@ public class DispatcherBehaviour extends OneShotBehaviour {
             this.info.clearBlockedNodes();
             this.info.flagBlockedNode(msgReceived);
             String lastReceiver = msgReceived.getSender().getLocalName();
-
             this.info.setLastReceiver(lastReceiver);
+
             if (info.didMet(lastReceiver)){
-                endCode = 727; // did met
+                endCode = 727; // did met -> share map
             }else{
                 info.addMet(lastReceiver);
                 endCode = 10; // not met yet
@@ -54,6 +54,9 @@ public class DispatcherBehaviour extends OneShotBehaviour {
 
     @Override
     public int onEnd() {
+        if (info.isFinished()){
+            return -1;
+        }
         return endCode;
     }
 }

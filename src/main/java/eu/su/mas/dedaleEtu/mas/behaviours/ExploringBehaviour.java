@@ -61,6 +61,12 @@ public class ExploringBehaviour extends OneShotBehaviour {
             //2) get the surrounding nodes and, if not in closedNodes, add them to open nodes.
             for (Couple<String, List<Couple<Observation, Integer>>> lob : lobs) {
                 String nodeId = lob.getLeft();
+                if (!lob.getRight().isEmpty()){
+                    if (lob.getRight().get(0).getLeft() == Observation.STENCH){
+                        this.info.addBlockedNode(nodeId);
+                    }
+                }
+
                 if (!this.info.getClosedNodes().contains(nodeId)) {
                     this.info.updateMaps(myPosition,nodeId);
                     if (this.info.getTargetNode() == null && !this.info.isNodeBlocked(nodeId))

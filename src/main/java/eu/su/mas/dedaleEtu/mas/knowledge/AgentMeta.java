@@ -41,6 +41,7 @@ public class AgentMeta implements Serializable {
 
     private boolean exploEnded = false;
     private boolean doPing = false;
+    private boolean finished = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
         this.listReceiverAgents = listReceiverAgents;
@@ -138,6 +139,11 @@ public class AgentMeta implements Serializable {
     public void flagBlockedNode(ACLMessage msg){
         blockedNodes.put(msg.getContent(), String.valueOf(msg.getSender().getLocalName()));
     }
+
+    public void addBlockedNode(String node){
+        blockedNodes.put(node,"WUMPUS");
+    }
+
 
     public boolean isNodeBlocked(String node){
         return blockedNodes.containsKey(node);
@@ -368,5 +374,13 @@ public class AgentMeta implements Serializable {
 
     public boolean hasExplorationTimedOut() {
         return Instant.now().toEpochMilli() >= explorationStart + explorationTimeout;
+    }
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished() {
+        this.finished = true;
     }
 }
