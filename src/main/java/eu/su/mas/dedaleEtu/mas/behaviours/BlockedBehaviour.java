@@ -60,6 +60,22 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 }
                 Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
                 int myPrio = info.getMySpecs().getPrio();
+                if(specs.get(receiver) == null){
+                    System.out.println("PRIO ERROR");
+                    info.setBlockStep(-1);
+                    if(info.getOpenNodes().size() == 1){
+                        info.setExploEnded();
+                    }
+                    info.addBlockedNode(info.getTargetNode());
+                    info.findTrajectory(((AbstractDedaleAgent)myAgent).getCurrentPosition());
+
+                    if(info.isExploEnded()){
+                        state = 2;
+                    }else {
+                        state = 1;
+                    }
+                    break;
+                }
                 int yourPrio = specs.get(receiver).getPrio();
                 if(myPrio>yourPrio){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
@@ -97,6 +113,11 @@ public class BlockedBehaviour extends OneShotBehaviour {
                     }
                 }
                 ((AbstractDedaleAgent)this.myAgent).moveTo(nextPos);
+                try {
+                    this.myAgent.doWait(300);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 break;
             case 5:
                 try {

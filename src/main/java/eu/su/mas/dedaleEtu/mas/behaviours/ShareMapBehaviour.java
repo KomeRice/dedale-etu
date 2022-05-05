@@ -69,6 +69,9 @@ public class ShareMapBehaviour extends OneShotBehaviour {
 		if(info.isFinished()){
 			return  -1; //finished
 		}
+		if(info.isExploEnded()){
+			return 2;
+		}
 		return 727; //continue exploring
 	}
 }

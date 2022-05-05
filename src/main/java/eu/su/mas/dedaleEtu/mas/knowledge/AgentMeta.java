@@ -141,7 +141,9 @@ public class AgentMeta implements Serializable {
     }
 
     public void addBlockedNode(String node){
-        blockedNodes.put(node,"WUMPUS");
+        if (node != null) {
+            blockedNodes.put(node, "WUMPUS");
+        }
     }
 
 

@@ -343,7 +343,7 @@ public class Principal {
 		agentName="Explo1";
 
 		//3) If you want to give specific parameters to your agent, add them here
-		Integer[] ec1 = {30,30,1000,1000};
+		Integer[] ec1 = {100,30,1000,1000};
 		String[] la1 = {"Explo2","Explo3"};
 		Object [] entityParametersExplo1={ec1,la1};
 
@@ -363,7 +363,7 @@ public class Principal {
 		agentName="Explo2";
 		
 		//3) If you want to give specific parameters to your agent, add them here
-		Integer[] ec2 = {30,30,1000,1000};
+		Integer[] ec2 = {100,30,1000,1000};
 		String[] la2 = {"Explo1","Explo3"};
 		Object [] entityParametersExplo2={ec2,la2};
 		
@@ -384,7 +384,7 @@ public class Principal {
 		agentName="Explo3";
 
 		//3) If you want to give specific parameters to your agent, add them here
-		Integer[] ec3 = {30,30,1000,1000};
+		Integer[] ec3 = {10,60,1000,1000};
 		String[] la3 = {"Explo1","Explo2"};
 		Object [] entityParametersExplo3={ec3,la3};
 

@@ -7,6 +7,7 @@ import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentSpecs;
 import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.behaviours.OneShotBehaviour;
+import org.glassfish.pfl.dynamic.copyobject.impl.FallbackObjectCopierImpl;
 
 import java.util.*;
 
@@ -40,7 +41,7 @@ public class CollectingBehavior extends OneShotBehaviour {
 
     @Override
     public void action() {
-        state = 0;
+        state = 2;
         String nextPos;
         info.setMyPosition(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
         switch (info.getCollectStep()){
@@ -66,9 +67,9 @@ public class CollectingBehavior extends OneShotBehaviour {
                     System.out.println("BACKPACK not full Finished");
                     return;
                 }
-                info.setMyPlan(makePlan().get(myAgent.getLocalName()));
-                info.setCollectStep(2);
                 info.setTargetReached();
+                info.setMyPlan(makePlan().get(myAgent.getLocalName()));
+
                 if(info.getMyPlan() == null){
                     System.out.println("PLAN NON GENERE");
                     for (Couple<Observation,Integer> c :((AbstractDedaleAgent)this.myAgent).getBackPackFreeSpace()){
@@ -82,11 +83,18 @@ public class CollectingBehavior extends OneShotBehaviour {
                             info.getMySpecs().setRessources(c.getRight());
                         }
                     }
-                    info.setMyPlan(makePlan().get(myAgent.getLocalName()));
+
+                    info.setMyPlan(makePlanSolo());
                 }
+                info.setCollectStep(2);
                 break;
 
             case 2:
+                try {
+                    this.myAgent.doWait(300);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 if (info.getMyPosition().equals(info.getTargetNode())){
                     info.setTargetReached();
                     ((AbstractDedaleAgent) this.myAgent).openLock(info.getTargetTreasure().getTreasureType());
@@ -119,6 +127,9 @@ public class CollectingBehavior extends OneShotBehaviour {
                         info.setTargetNode(target.getNodeName(), info.getMyMap().getShortestPath(info.getMyPosition(), target.getNodeName()));
                     }
                 }
+                List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
+                Position.GeneratePositionFromObservations(lobs,info);
+
                 nextPos = info.getNextNode();
                 if (!Objects.equals(nextPos, "")){
                     if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
@@ -189,7 +200,7 @@ public class CollectingBehavior extends OneShotBehaviour {
                     specs.appointRessources(specs.getCap());
                 }
 
-                if (interest.isEmpty()){
+                if (noMore(specs.getType())){
                     return missions;
                 }
             }
@@ -303,4 +314,56 @@ public class CollectingBehavior extends OneShotBehaviour {
         return true;
     }
 
+    public List<Position> makePlanSolo(){
+        Position toAdd = null;
+        AgentSpecs specs = info.getMySpecs();
+        ArrayList<Position> mission = new ArrayList<>();
+        while(specs.getCap()!=0) {
+            if (specs.getType() == Observation.DIAMOND) {
+                toAdd = findClosest(interest, specs.getDiamondCap(), -1);
+            } else if (specs.getType() == Observation.GOLD) {
+                toAdd = findClosest(interest, -1, specs.getGoldCap());
+            } else {
+                toAdd = findClosest(interest, specs.getDiamondCap(), specs.getGoldCap());
+                Observation treasureType = toAdd.getTreasureType();
+                if (treasureType == Observation.DIAMOND) {
+                    specs.setType(Observation.DIAMOND);
+                } else {
+                    specs.setType(Observation.GOLD);
+                }
+            }
+            if (toAdd == null) {
+                System.out.println("ERROR ON CALCULATING");
+            }
+            mission.add(toAdd);
+            int v = toAdd.getTreasureValue();
+            if (v < specs.getCap()) {
+                interest.remove(toAdd);
+                specs.appointRessources(v);
+            } else {
+                toAdd.setTreasureValue(v - specs.getCap());
+                Collections.shuffle(interest);
+                specs.appointRessources(specs.getCap());
+                return mission;
+            }
+
+            if (noMore(specs.getType())) {
+                return mission;
+            }
+        }
+        return mission;
+    }
+
+    public boolean noMore(Observation type){
+        boolean rep = true;
+        switch (type){
+            case DIAMOND:case GOLD:
+                for (Position p : interest){
+                    if(p.getTreasureType() == type){
+                        rep = false;
+                    }
+                }
+        }
+        return rep;
+    }
 }

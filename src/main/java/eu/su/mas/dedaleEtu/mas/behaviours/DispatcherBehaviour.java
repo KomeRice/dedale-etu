@@ -18,6 +18,14 @@ public class DispatcherBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
+        if(info.isExploEnded()){
+            endCode = 4;
+        }
+        if (info.isFinished()){
+            endCode = -1;
+        }
+
+
         MessageTemplate msgTemplate = MessageTemplate.MatchProtocol("PING");
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if(msgReceived != null){
@@ -54,9 +62,6 @@ public class DispatcherBehaviour extends OneShotBehaviour {
 
     @Override
     public int onEnd() {
-        if (info.isFinished()){
-            return -1;
-        }
         return endCode;
     }
 }
