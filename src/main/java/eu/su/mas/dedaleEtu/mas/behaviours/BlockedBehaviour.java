@@ -18,6 +18,7 @@ import jade.lang.acl.UnreadableException;
 import java.time.Instant;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Random;
 
 public class BlockedBehaviour extends OneShotBehaviour {
     // step ==0 -> find another route
@@ -37,11 +38,11 @@ public class BlockedBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
+        String myPosition = ((AbstractDedaleAgent)myAgent).getCurrentPosition();
         switch (info.getBlockStep()){
             case 1:
-                //find another route
+
             case 2:
-                String myPosition = ((AbstractDedaleAgent)myAgent).getCurrentPosition();
                 BlockedMessage msg = new BlockedMessage(this.myAgent.getAID(),myPosition, Instant.now().toEpochMilli());
                 for (String agentName : info.getListReceiverAgents()) {
                     msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
@@ -61,13 +62,24 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 Hashtable<String, AgentSpecs> specs = info.getAgentSpecsHashtable();
                 int myPrio = info.getMySpecs().getPrio();
                 if(specs.get(receiver) == null){
-                    System.out.println("PRIO ERROR");
+                    System.out.println("PRIO ERROR Random move");
                     info.setBlockStep(-1);
-                    if(info.getOpenNodes().size() == 1){
-                        info.setExploEnded();
+
+                    if (myPosition!=null) {
+                        //random walk
+                        List<Couple<String, List<Couple<Observation, Integer>>>> lobs = ((AbstractDedaleAgent) this.myAgent).observe();//myPosition
+
+                        try {
+                            this.myAgent.doWait(300);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        Random r = new Random();
+                        int moveId = 1 + r.nextInt(lobs.size() - 1);
+                        ((AbstractDedaleAgent) this.myAgent).moveTo(lobs.get(moveId).getLeft());
                     }
-                    info.addBlockedNode(info.getTargetNode());
-                    info.findTrajectory(((AbstractDedaleAgent)myAgent).getCurrentPosition());
+
 
                     if(info.isExploEnded()){
                         state = 2;
@@ -80,7 +92,9 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 if(myPrio>yourPrio){
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());
-                    msg2.addReceiver(new AID(receiver,AID.ISLOCALNAME));
+                    for (String agentName : info.getListReceiverAgents()) {
+                        msg2.addReceiver(new AID(agentName,AID.ISLOCALNAME));
+                    }
                     ((AbstractDedaleAgent)this.myAgent).sendMessage(msg2);
                 }else{
                     MessageTemplate msgTemplate=MessageTemplate.and(
