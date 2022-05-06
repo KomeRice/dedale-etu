@@ -19,15 +19,8 @@ import java.time.Instant;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
-
+/**Comportement de blocage */
 public class BlockedBehaviour extends OneShotBehaviour {
-    // step ==0 -> find another route
-    //step == 1 -> broadcast im blocked
-    //stp 2 -> send prio message and receive it
-    //step 3 if my prio is low -> wait for message else send my path
-    // step 4 follow the path until you can unlock then wait
-    // if thre is a time out continue exploring/collecting
-
     private AgentMeta info;
     private int state;
 
@@ -41,8 +34,9 @@ public class BlockedBehaviour extends OneShotBehaviour {
         String myPosition = ((AbstractDedaleAgent)myAgent).getCurrentPosition();
         switch (info.getBlockStep()){
             case 1:
-
+                //calcul d'un autre chemin(pas implementé)
             case 2:
+                //envoie d'un message de blocage
                 BlockedMessage msg = new BlockedMessage(this.myAgent.getAID(),myPosition, Instant.now().toEpochMilli());
                 for (String agentName : info.getListReceiverAgents()) {
                     msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
@@ -51,8 +45,9 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 state = 3; //go to dispatcher
                 break;
             case 3:
+                //Compare la priorité pour savoir qui va laisser passer
                 String receiver = this.info.getLastReceiver();
-                if (receiver == null ||receiver == "asm" ){
+                if (receiver == null || receiver.equals("asm")){
                     if(info.isExploEnded()){
                         state = 2;
                     }else {
@@ -90,6 +85,7 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 }
                 int yourPrio = specs.get(receiver).getPrio();
                 if(myPrio>yourPrio){
+                    /*Si j'ai la priorité j'envoie mon chemin*/
                     List<String> currentTrajectory =  info.getCurrentTrajectory();
                     MyPathMessage msg2 = new MyPathMessage(myAgent.getAID(),currentTrajectory, Instant.now().toEpochMilli());
                     for (String agentName : info.getListReceiverAgents()) {
@@ -97,6 +93,7 @@ public class BlockedBehaviour extends OneShotBehaviour {
                     }
                     ((AbstractDedaleAgent)this.myAgent).sendMessage(msg2);
                 }else{
+                    /*Si j'ai pas la priorité j'ecoute et j'enregistre ton chemin */
                     MessageTemplate msgTemplate=MessageTemplate.and(
                             MessageTemplate.MatchProtocol("PATH"),
                             MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -116,6 +113,7 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 info.setBlockStep(5);
                 break;
             case 4:
+                /*Je suis le chemin jusqu'a trouver un noeud pas dans le chemin*/
                 List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
                 String nextPos = info.getNextBlockedPath();
                 for (Couple<String, List<Couple<Observation, Integer>>> lob : lobs) {
@@ -134,6 +132,7 @@ public class BlockedBehaviour extends OneShotBehaviour {
                 }
                 break;
             case 5:
+                /*Et j'attends*/
                 try {
                     this.myAgent.doWait(5000);
                 } catch (Exception e) {

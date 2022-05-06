@@ -6,7 +6,7 @@ import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 
-
+/**Comportement de lecture de message */
 public class DispatcherBehaviour extends OneShotBehaviour {
     private AgentMeta info;
     private int endCode = 3;
@@ -19,13 +19,13 @@ public class DispatcherBehaviour extends OneShotBehaviour {
     @Override
     public void action() {
         if(info.isExploEnded()){
-            endCode = 4;
+            endCode = 4;//-> collecte
         }
         if (info.isFinished()){
-            endCode = -1;
+            endCode = -1;//-> finished
         }
 
-
+        /*reception de ping */
         MessageTemplate msgTemplate = MessageTemplate.MatchProtocol("PING");
         ACLMessage msgReceived = this.myAgent.receive(msgTemplate);
         if(msgReceived != null){
@@ -43,6 +43,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
             }
         }
 
+        /*Reception de blocage*/
         MessageTemplate msgTemplate2 = MessageTemplate.MatchProtocol("BLOCKED");
         msgReceived = this.myAgent.receive(msgTemplate2);
         if (msgReceived != null){
@@ -53,7 +54,7 @@ public class DispatcherBehaviour extends OneShotBehaviour {
                 endCode = 9;//BLOCKED
             }else {
                 info.addMet(lastReceiver);
-                endCode = 10;
+                endCode = 10;//->first met
             }
 
         }

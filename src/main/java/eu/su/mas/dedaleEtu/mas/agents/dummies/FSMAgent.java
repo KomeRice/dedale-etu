@@ -5,18 +5,19 @@ import eu.su.mas.dedale.mas.agent.behaviours.startMyBehaviours;
 import eu.su.mas.dedaleEtu.mas.behaviours.*;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentSpecs;
-import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.FSMBehaviour;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-
+/**
+ * Agent d'exploration, et de collecte
+ * */
 public class FSMAgent extends AbstractDedaleAgent {
     private static final long serialVersionUID = -7969469610271668140L;
     private AgentMeta info;
+
 
     protected void setup() {
 

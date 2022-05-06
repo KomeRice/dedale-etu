@@ -7,7 +7,6 @@ import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentSpecs;
 import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.behaviours.OneShotBehaviour;
-import org.glassfish.pfl.dynamic.copyobject.impl.FallbackObjectCopierImpl;
 
 import java.util.*;
 
@@ -18,8 +17,8 @@ public class CollectingBehavior extends OneShotBehaviour {
     private List<Position> interest;
     private int blockedCounter = 0;
 
-    //step 1 return to rdv point
-    //step 2 share prio and backpack capacity
+
+
     //step 3 the highest prio do the plan :
         //the backpack capacity the closest to the resources
     //step 4 go to the assigned locations
@@ -46,7 +45,8 @@ public class CollectingBehavior extends OneShotBehaviour {
         info.setMyPosition(((AbstractDedaleAgent)this.myAgent).getCurrentPosition());
         switch (info.getCollectStep()){
             case 0:
-                if (!info.hasTargetNode()){
+                // return to rdv point
+                if (info.noTargetNode()){
                     info.setTargetNode(info.getRdvPoint(),info.getMyMap().getShortestPath(info.getMyPosition(), info.getRdvPoint()));
                 }
                 nextPos = info.getNextNode();
@@ -58,8 +58,8 @@ public class CollectingBehavior extends OneShotBehaviour {
                 }
                 break;
 
-
             case 1:
+                //calcule un plan
                 if (stillTreasure(info.getMySpecs().getType())){
                     Observation a = info.getMySpecs().getType();
                     state = -1;//NO MORE TREASURE OF THIS TYPE FINISHED
@@ -90,21 +90,23 @@ public class CollectingBehavior extends OneShotBehaviour {
                 break;
 
             case 2:
+                //si mon plan n'est pas vide, je le suis,sinon j'essaye de trouver une autre ressource
                 try {
                     this.myAgent.doWait(300);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 if (info.getMyPosition().equals(info.getTargetNode())){
+                    /*Si je suis arrivé a ma destination*/
                     info.setTargetReached();
                     ((AbstractDedaleAgent) this.myAgent).openLock(info.getTargetTreasure().getTreasureType());
                     ((AbstractDedaleAgent) this.myAgent).pick();
                     System.out.println(myAgent.getLocalName() + "  Picked Treasure");
                 }
-                if (!info.hasTargetNode()){
+                if (info.noTargetNode()){
                     if (info.getMyPlan().isEmpty()){
+                        /*Le plan est suivi*/
                         info.setCollectStep(-1);
-                        System.out.println("Plan vide");
                         for(Couple<Observation,Integer> c : ((AbstractDedaleAgent) this.myAgent).getBackPackFreeSpace()){
                             if(c.getLeft() == info.getMySpecs().getType()){
                                 if(c.getRight() == 0){
@@ -122,14 +124,17 @@ public class CollectingBehavior extends OneShotBehaviour {
                             }
                         }
                     }else {
+                        //prend le premier noeud du plan et le met en destination
                         Position target = info.getMyPlan().remove(0);
                         info.setTargetTreasure(target);
                         info.setTargetNode(target.getNodeName(), info.getMyMap().getShortestPath(info.getMyPosition(), target.getNodeName()));
                     }
                 }
+                /*Regarde les environs pour voir de nouvelles ressources*/
                 List<Couple<String,List<Couple<Observation,Integer>>>> lobs=((AbstractDedaleAgent)this.myAgent).observe();
                 Position.GeneratePositionFromObservations(lobs,info);
 
+                /*Bouger sur le noeud chosi*/
                 nextPos = info.getNextNode();
                 if (!Objects.equals(nextPos, "")){
                     if (((AbstractDedaleAgent) this.myAgent).moveTo(nextPos)) {
@@ -157,6 +162,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         return state;
     }
 
+    /**Cree un plan en fontion des ressources enregistre et des agents rencontrés*/
     public Hashtable<String,List<Position>> makePlan(){
         List<String> agents = prioritySort();
         Position toAdd;
@@ -218,6 +224,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         return sum;
     }
 
+    /**Trie les agents par priorité*/
     public List<String> prioritySort(){
         ArrayList<Integer> prio = new ArrayList<>();
         List<String> sorted = new ArrayList<>();
@@ -239,6 +246,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         return sorted;
     }
 
+    /**Cherche la valeur la plus proche de des capacités*/
     public Position findClosest(List<Position> interest, int diamondCap,int goldCap){
         Position bestPosGold = null;
         Position bestPosDiamond = null;
@@ -277,6 +285,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         return bestPosGold;
     }
 
+    /**Retourne la ressource la valeur du tresor le proche entre deux ressources*/
     public Position getClosest(Position p1, Position p2 , int value){
         int v1 = p1.getTreasureValue();
         int v2 = p2.getTreasureValue();
@@ -302,6 +311,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         }
     }
 
+    /**Retourne si il y a encore des tresors du type*/
     public boolean stillTreasure(Observation type){
         if (type == Observation.ANY_TREASURE){
             return interest.isEmpty();
@@ -314,6 +324,7 @@ public class CollectingBehavior extends OneShotBehaviour {
         return true;
     }
 
+    /**Cree un plan seul*/
     public List<Position> makePlanSolo(){
         Position toAdd = null;
         AgentSpecs specs = info.getMySpecs();
@@ -354,13 +365,15 @@ public class CollectingBehavior extends OneShotBehaviour {
         return mission;
     }
 
+    /**Retourne si il y a encore des tresors du type*/
     public boolean noMore(Observation type){
         boolean rep = true;
         switch (type){
             case DIAMOND:case GOLD:
                 for (Position p : interest){
-                    if(p.getTreasureType() == type){
+                    if (p.getTreasureType() == type) {
                         rep = false;
+                        break;
                     }
                 }
         }

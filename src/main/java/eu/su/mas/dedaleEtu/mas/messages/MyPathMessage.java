@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
+/** Message de contenant le chemin lors d'un blocage
+ * */
 public class MyPathMessage extends ACLMessage {
     public MyPathMessage(AID sender, List<String> myPath , long timestamp) {
         super(ACLMessage.INFORM);

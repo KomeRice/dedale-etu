@@ -6,7 +6,8 @@ import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import jade.util.leap.Serializable;
 
 import java.util.Random;
-
+/** Classe modélisant les characteristiques des agents
+ * */
 public class AgentSpecs implements Serializable {
     private final int prio;
     private Observation type;
@@ -83,7 +84,7 @@ public class AgentSpecs implements Serializable {
             return Math.max(goldCap,diamondCap);
         }
     }
-
+    /**Enleve la valeur des ressources a la capacité*/
     public void appointRessources(int value){
         if (type == Observation.DIAMOND){
             diamondCap -=value;

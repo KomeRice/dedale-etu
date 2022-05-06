@@ -10,11 +10,9 @@ import jade.core.behaviours.OneShotBehaviour;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
-
+/**Comportement de fin de collecte : random collecte en ecoutant les ping et les blocages*/
 public class FinishedStateBehaviour extends OneShotBehaviour {
 
-    private int done = -1;
-    private int state;
     private AgentMeta info;
 
     public FinishedStateBehaviour(final Agent a, AgentMeta info) {

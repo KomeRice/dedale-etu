@@ -7,16 +7,16 @@ import jade.util.leap.Serializable;
 import java.time.Instant;
 import java.util.List;
 
+/** Classe modelisant un point de ressources
+ * */
 public class Position implements Serializable {
     private Observation treasureType;
     private int treasureValue;
-    private String nodeName;
+    private final String nodeName;
     private boolean lockOpen;
     private int lockpickReq;
     private int strengthReq;
     private long timeStamp;
-
-
 
     private Position(Observation treasureType, int treasureValue, String nodeName, boolean lockOpen, int lockpickReq, int strengthReq) {
         this.treasureType = treasureType;
@@ -59,6 +59,8 @@ public class Position implements Serializable {
         return strengthReq;
     }
 
+    /** Met a jour une position avec une version plus recente
+     * */
     public void updatePos(Position p){
         if (p.getTimeStamp()> this.getTimeStamp()){
             this.treasureType = p.getTreasureType();
@@ -70,6 +72,8 @@ public class Position implements Serializable {
         }
     }
 
+    /** Genere des positions a partir d'une liste d'observation
+     * */
     public static void GeneratePositionFromObservations(List<Couple<String, List<Couple<Observation,Integer>>>> lobs, AgentMeta a){
         for(Couple<String, List<Couple<Observation,Integer>>> obs : lobs){
             if(obs.getRight().size() == 0){
@@ -109,7 +113,6 @@ public class Position implements Serializable {
                 continue;
             }
 
-            // todo: state changes
             a.addInterest(new Position(treasureType, treasureValue, nodeName, lockOpen, lockpickReq, strengthReq));
 
         }

@@ -7,6 +7,8 @@ import jade.lang.acl.ACLMessage;
 
 import java.io.IOException;
 
+/** Message d'envoie de characteristique lors de la premiere rencontre
+ * */
 public class FirstMetMessage extends ACLMessage {
     public FirstMetMessage(AID sender, String pos, AgentSpecs agentSpecs, long timestamp) {
         super(ACLMessage.INFORM);

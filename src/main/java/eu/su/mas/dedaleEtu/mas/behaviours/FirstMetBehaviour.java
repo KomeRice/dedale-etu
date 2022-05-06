@@ -14,6 +14,7 @@ import jade.lang.acl.UnreadableException;
 import java.time.Instant;
 import java.util.Objects;
 
+/**Comportement de premiere rencontre */
 public class FirstMetBehaviour extends OneShotBehaviour {
     private AgentMeta info;
 
@@ -24,6 +25,7 @@ public class FirstMetBehaviour extends OneShotBehaviour {
 
     @Override
     public void action() {
+        /*Creation de message*/
         String receiver = this.info.getLastReceiver();
         String pos = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
         if(!Objects.equals(info.getRdvPoint(), "")){
@@ -35,10 +37,10 @@ public class FirstMetBehaviour extends OneShotBehaviour {
                 pos,agentSpecs,
                 Instant.now().toEpochMilli());
         toSend.addReceiver(new AID(receiver,AID.ISLOCALNAME));
-
+        /*envoie*/
         ((AbstractDedaleAgent)this.myAgent).sendMessage(toSend);
 
-
+        /*Reception*/
         MessageTemplate msgTemplate=MessageTemplate.and(
                 MessageTemplate.MatchProtocol("SPECS"),
                 MessageTemplate.MatchPerformative(ACLMessage.INFORM));
@@ -58,8 +60,8 @@ public class FirstMetBehaviour extends OneShotBehaviour {
     @Override
     public int onEnd() {
         if(info.getBlockStep()>0){
-            return 2;
+            return 2;//2-> blocked
         }
-        return 1;
+        return 1;//-> sharing
     }
 }
