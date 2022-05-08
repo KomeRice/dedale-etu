@@ -10,6 +10,8 @@ import jade.lang.acl.ACLMessage;
 import java.io.IOException;
 import java.util.List;
 
+/** Message de partage de carte et des points de ressources
+ * */
 public class MetaMessage extends ACLMessage {
     public MetaMessage(AID sender, MapData mapData, List<Position> interest, long timestamp){
         super(ACLMessage.INFORM);
@@ -17,7 +19,7 @@ public class MetaMessage extends ACLMessage {
         this.setProtocol("META");
         this.setPostTimeStamp(timestamp);
         try{
-            this.setContentObject(new Couple<MapData,List<Position>>(mapData,interest));
+            this.setContentObject(new Couple<>(mapData,interest));
         }
         catch(IOException e){
             this.setContent("Failed to pack agent meta");

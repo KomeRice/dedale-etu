@@ -7,13 +7,12 @@ import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
 import eu.su.mas.dedaleEtu.mas.knowledge.MapRepresentation;
 import eu.su.mas.dedaleEtu.mas.knowledge.Position;
 import jade.core.behaviours.OneShotBehaviour;
-import net.sourceforge.plantuml.Run;
-import org.omg.SendingContext.RunTime;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**Comportement d'exploration*/
 public class ExploringBehaviour extends OneShotBehaviour {
     private AgentMeta info;
     private int state;
@@ -29,7 +28,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
         state = 0;
         if(this.info.getMyMap() ==null )
             this.info.setMyMap(new MapRepresentation());
-
+        /*Si explo timed alors on part en collecte*/
         if(this.info.hasExplorationTimedOut()) {
             System.out.println("EXPLORATION TIMED OUT");
             info.setExploEnded();
@@ -84,7 +83,7 @@ public class ExploringBehaviour extends OneShotBehaviour {
                 System.out.println(myAgent.getLocalName() + " Exploring done");
 
             } else {
-                if (!this.info.hasTargetNode()) {
+                if (this.info.noTargetNode()) {
                     // try to go for another open node
                     this.info.findTrajectory(myPosition);
                 }

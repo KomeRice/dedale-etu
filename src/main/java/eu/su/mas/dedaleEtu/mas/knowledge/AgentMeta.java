@@ -7,40 +7,65 @@ import jade.util.leap.Serializable;
 import java.time.Instant;
 import java.util.*;
 
+/** Classe de tous les donnes dont l'agent a besoin
+ * */
 public class AgentMeta implements Serializable {
 
+    /**Liste des autres agents*/
     private List<String> listReceiverAgents;
+    /**Representation graphique de la carte*/
     private MapRepresentation myMap;
+    /**Noeuds non exploré*/
     private Set<String> openNodes;
+    /**Noeud exploré*/
     private Set<String> closedNodes;
+    /**Liste des ressources enregistré */
     private List<Position> interests;
+    /**Liste des noeuds occupés */
     private Hashtable<String,String> blockedNodes;
+    /**Noeud cible */
     private String targetNode = null;
+    /**Trajectoire vers le noeud cible */
     private List<String> currentTrajectory;
+    /**Dernier correspondant */
     private String lastReceiver ="";
 
-    private long explorationStart;
+    /**Temps de debut de l'exploration */
+    private final long explorationStart;
+    /**Temps de timeout */
     private final int explorationTimeout = 240000;
 
+    /**Table des characteristiques des agents */
     private Hashtable<String,AgentSpecs> agentSpecsHashtable;
+    /**Mes characteristiques */
     private AgentSpecs mySpecs;
-
+    /**Ma position */
     private String myPosition ="";
-
+    /**Table des agents et de leurs carte depuis la derniere rencontre */
     private Hashtable<String,MapData> toShare ;
 
+    /**position de regroupement(non utilisé) */
     private String rdvPoint = "";
+    /**Liste des agents croisée */
     private List<String> met;
+    /**Chemin de l'agent bloqué */
     private List<String> blockedPath;
 
+    /**Mon plan de collecte */
     private List<Position> myPlan;
 
+    /**etape du processus de blocage */
     private int blockStep = -1;
+    /**etape du processus de collecte */
     private int collectStep = -1;
+    /**tresor cible */
     private Position targetTreasure;
 
+    /**Exploration fini ou pas */
     private boolean exploEnded = false;
+    /**Exploration : ping ou pas */
     private boolean doPing = false;
+    /**Collecte fini ou pas */
     private boolean finished = false;
 
     public AgentMeta(List<String> listReceiverAgents) {
@@ -60,6 +85,7 @@ public class AgentMeta implements Serializable {
         this.explorationStart = Instant.now().toEpochMilli();
     }
 
+    /**Met a jour la carte et la liste des cartes avec les information des voisins */
     public void updateMaps(String myPosition, String nodeId) {
         if (!this.getOpenNodes().contains(nodeId)) {
             openNodes.add(nodeId);
@@ -77,7 +103,7 @@ public class AgentMeta implements Serializable {
             }
         }
     }
-
+    /**Met a jour la position courante dans les cartes */
     public void updatePosition(String myPosition){
         closedNodes.add(myPosition);
         openNodes.remove(myPosition);
@@ -94,6 +120,7 @@ public class AgentMeta implements Serializable {
         return currentTrajectory.isEmpty();
     }
 
+    /**Trouve le chemin vers le noeud non bloque le plus proche */
     public void findTrajectory(String myPosition){
         List<String> shortestPath = null;
         String node = null;
@@ -125,17 +152,18 @@ public class AgentMeta implements Serializable {
         this.setTargetNode(node, shortestPath);
     }
 
-    public boolean addInterest(Position pos){
+    /**Ajoute une ressource dans la liste*/
+    public void addInterest(Position pos){
         for (Position p : interests) {
             if (Objects.equals(p.getNodeName(), pos.getNodeName())) {
                 p.updatePos(pos);
-                return false;
+                return;
             }
         }
         interests.add(pos);
-        return true;
     }
 
+    /**Ajoute un noeud dans la liste des noeuds bloqués */
     public void flagBlockedNode(ACLMessage msg){
         blockedNodes.put(msg.getContent(), String.valueOf(msg.getSender().getLocalName()));
     }
@@ -145,7 +173,6 @@ public class AgentMeta implements Serializable {
             blockedNodes.put(node, "WUMPUS");
         }
     }
-
 
     public boolean isNodeBlocked(String node){
         return blockedNodes.containsKey(node);
@@ -159,6 +186,7 @@ public class AgentMeta implements Serializable {
         this.targetNode = null;
     }
 
+    /**Retourne le prochain noeud non bloqué du chemin */
     public String getNextNode(){
         String out;
         try{
@@ -175,6 +203,7 @@ public class AgentMeta implements Serializable {
         return out;
     }
 
+    /**Annule un mouvemenet */
     public void cancelMove(String node){
         this.currentTrajectory.add(0,node);
     }
@@ -189,8 +218,8 @@ public class AgentMeta implements Serializable {
         //System.out.println("SET TARGET TO " + targetNode);
     }
 
-    public boolean hasTargetNode() {
-        return targetNode != null;
+    public boolean noTargetNode() {
+        return targetNode == null;
     }
 
     public List<String> getListReceiverAgents() {
@@ -225,6 +254,7 @@ public class AgentMeta implements Serializable {
         return lastReceiver;
     }
 
+    /**Retourne la carte de l'agent depuis la derniere rencontre et la remplace par une nouvelle qui contient que les noeuds ouverts de l'ancien */
     public MapData getToSendMap(String receiver){
         MapData mapData =  this.toShare.get(receiver);
         if (mapData != null){
@@ -241,6 +271,7 @@ public class AgentMeta implements Serializable {
         return agentSpecsHashtable;
     }
 
+    /**Fussionne la carte recu dans sa propre carte */
     public void mergeMap(MapData sgreceived){
         for (String node : sgreceived.getOpenNodes()){
             if (this.myPosition.equals(node)){
@@ -270,6 +301,7 @@ public class AgentMeta implements Serializable {
         this.myPosition = myPosition;
     }
 
+    /**Fusionne les points de ressources */
     public void mergeInterest(List<Position> interests){
         for (Position p : interests){
             addInterest(p);
@@ -286,6 +318,7 @@ public class AgentMeta implements Serializable {
         }
     }
 
+    /**Ajoute dans la liste des rencontres */
     public void addMet(String name){
         met.add(name);
     }
@@ -293,7 +326,7 @@ public class AgentMeta implements Serializable {
     public boolean didMet(String name){
         return met.contains(name);
     }
-
+    /**Ajoute dans la table des characteristiques */
     public void addSpecs(String name, AgentSpecs a){
         agentSpecsHashtable.computeIfAbsent(name,k->a);
     }

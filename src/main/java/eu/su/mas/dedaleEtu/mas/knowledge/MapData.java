@@ -8,10 +8,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/** Classe modélisant les donnes de la carte
+ * Utilisé pour creer des parties de cartes a envoyer
+ * */
 public class MapData implements Serializable {
-
+    /**Noeuds ouverts*/
     private Set<String> openNodes;
+    /**Noeuds fermés*/
     private Set<String> closedNodes;
+    /**Liste des arcs*/
     private List<Couple<String,String>> edges;
 
     public MapData() {

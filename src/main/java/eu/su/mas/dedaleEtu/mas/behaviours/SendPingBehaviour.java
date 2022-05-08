@@ -5,13 +5,12 @@ import java.util.Objects;
 
 import eu.su.mas.dedale.mas.AbstractDedaleAgent;
 import eu.su.mas.dedaleEtu.mas.knowledge.AgentMeta;
-import eu.su.mas.dedaleEtu.mas.messages.MetaMessage;
 import eu.su.mas.dedaleEtu.mas.messages.PingMessage;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
-import jade.lang.acl.ACLMessage;
 
+/**Comportement d'envoie de Ping */
 public class SendPingBehaviour extends OneShotBehaviour {
 
 
@@ -27,6 +26,7 @@ public class SendPingBehaviour extends OneShotBehaviour {
 		String myPosition = ((AbstractDedaleAgent)this.myAgent).getCurrentPosition();
 
 		if (!Objects.equals(myPosition, "")){
+			/*Creation de message*/
 			PingMessage msg = new PingMessage(this.myAgent.getAID(),
 					myPosition,
 					Instant.now().toEpochMilli());
@@ -37,14 +37,13 @@ public class SendPingBehaviour extends OneShotBehaviour {
 				msg.addReceiver(new AID(agentName,AID.ISLOCALNAME));
 			}
 			
-
-			//Mandatory to use this method (it takes into account the environment to decide if someone is reachable or not)
+			/*Envoie*/
 			((AbstractDedaleAgent)this.myAgent).sendMessage(msg);
 		}
 	}
 
 	@Override
 	public int onEnd() {
-		return 2; //2 -> pong
+		return 2; //2 -> dispatcher
 	}
 }
