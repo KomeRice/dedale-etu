@@ -12,6 +12,9 @@ import jade.lang.acl.MessageTemplate;
 import jade.lang.acl.UnreadableException;
 
 import java.time.Instant;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**Comportement de premiere rencontre */
@@ -33,8 +36,9 @@ public class FirstMetBehaviour extends OneShotBehaviour {
         }
         AgentSpecs agentSpecs = info.getMySpecs();
         info.addSpecs(myAgent.getLocalName(),agentSpecs);
+        Hashtable<String, AgentSpecs> lspecs = info.getAgentSpecsHashtable();
         FirstMetMessage toSend = new FirstMetMessage(this.myAgent.getAID(),
-                pos,agentSpecs,
+                pos,lspecs,
                 Instant.now().toEpochMilli());
         toSend.addReceiver(new AID(receiver,AID.ISLOCALNAME));
         /*envoie*/
@@ -46,14 +50,17 @@ public class FirstMetBehaviour extends OneShotBehaviour {
                 MessageTemplate.MatchPerformative(ACLMessage.INFORM));
         ACLMessage msgReceived=this.myAgent.blockingReceive(msgTemplate, 800);
         if (msgReceived!=null) {
-            Couple<String, AgentSpecs> sgreceived = null;
+            Couple<String, Hashtable<String, AgentSpecs>> sgreceived = null;
             try {
-                sgreceived = (Couple<String, AgentSpecs>) msgReceived.getContentObject();
+                sgreceived = (Couple<String, Hashtable<String, AgentSpecs>>) msgReceived.getContentObject();
             } catch (UnreadableException e) {
                 e.printStackTrace();
             }
             this.info.setRdvPoint(sgreceived.getLeft());
-            this.info.addSpecs(msgReceived.getSender().getLocalName(), sgreceived.getRight());
+            for (Map.Entry<String, AgentSpecs> entry :sgreceived.getRight().entrySet()){
+                this.info.addSpecs(entry.getKey(), entry.getValue());
+            }
+
         }
     }
 
